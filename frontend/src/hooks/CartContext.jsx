@@ -80,10 +80,7 @@ export const CartProvider = ({ children, allFormations }) => {
 
   const addToCart = useCallback(async (formationId) => {
     if (isCourseInCart(formationId)) {
-<<<<<<< HEAD
       // Notification gérée par le frontend
-=======
->>>>>>> b903be25ca68bf51ec3706fd8671080ec6eab449
       toast(TOAST_MESSAGES.ALREADY_IN_CART);
       return;
     }
@@ -93,39 +90,24 @@ export const CartProvider = ({ children, allFormations }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, ADD_TO_CART_DELAY_MS));
       setSelectedFormations((prevSelected) => [...prevSelected, formationId]);
-<<<<<<< HEAD
       // Notification gérée par le frontend
       toast(TOAST_MESSAGES.ADD_SUCCESS);
     } catch (error) {
       console.error("Erreur lors de l'ajout au panier:", error);
       // Notification gérée par le frontend
-=======
-      toast(TOAST_MESSAGES.ADD_SUCCESS);
-    } catch (error) {
-      console.error("Erreur lors de l'ajout au panier:", error);
->>>>>>> b903be25ca68bf51ec3706fd8671080ec6eab449
       toast(TOAST_MESSAGES.ADD_ERROR);
     } finally {
       setEnrollingId(null);
     }
-<<<<<<< HEAD
   }, [isCourseInCart, toast]); // 'toast' est de nouveau une dépendance ici
-=======
-  }, [isCourseInCart, toast]);
->>>>>>> b903be25ca68bf51ec3706fd8671080ec6eab449
 
   const removeFromCart = useCallback((formationIdToRemove) => {
     setSelectedFormations((prevSelected) =>
       prevSelected.filter((id) => id !== formationIdToRemove)
     );
-<<<<<<< HEAD
     // Notification gérée par le frontend
     toast(TOAST_MESSAGES.REMOVE_SUCCESS);
   }, [toast]); // 'toast' est de nouveau une dépendance ici
-=======
-    toast(TOAST_MESSAGES.REMOVE_SUCCESS);
-  }, [toast]);
->>>>>>> b903be25ca68bf51ec3706fd8671080ec6eab449
 
   const handleBulkEnrollment = useCallback(async () => {
     if (selectedFormations.length === 0) {

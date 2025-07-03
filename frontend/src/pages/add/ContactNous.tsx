@@ -307,7 +307,7 @@ const ContactNous = () => {
                           <Button variant="outline" onClick={() => setIsSubmitted(false)}>
                             Nouvelle demande
                           </Button>
-                          <Button onClick={() => window.location.href = "/add/telecom-calendar"}>
+                          <Button onClick={() => window.location.href = "/add/calendar-form"}>
                             Retour aux formations
                           </Button>
                         </CardFooter>
