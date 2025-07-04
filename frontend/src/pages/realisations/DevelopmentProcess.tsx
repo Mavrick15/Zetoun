@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect, Suspense } from 'react';
-import { ArrowLeft, CheckCircle, Check, Loader2 } from 'lucide-react';
+import React, { useEffect, useState, Suspense, useRef } from 'react';
+import { ArrowLeft, Check } from 'lucide-react'; // Removed unused CheckCircle, Loader2
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { motion } from "framer-motion";
+import { cn } from '@/lib/utils'; // Assuming cn utility is available
 import PageLayout from '@/components/PageLayout';
 import SEO from '@/components/SEO';
 
@@ -10,6 +11,90 @@ const DevelopmentProcess = () => {
   const processRef = useRef(null);
   const processSectionsRef = useRef<(HTMLDivElement | null)[]>([]);
   const [loadingProgress, setLoadingProgress] = useState(0);
+
+  // Constants for text content
+  const TEXT_CONSTANTS = {
+    SEO_TITLE: "Notre Processus de Déploiement Structuré - Zetoun Labs",
+    SEO_DESCRIPTION: `Découvrez notre processus de développement IT structuré, de la compréhension des besoins au support continu, pour des solutions innovantes et efficaces.`,
+    SEO_KEYWORDS: ["processus de développement", "déploiement IT", "méthodologie", "gestion de projet", "ZL Technologies"],
+    BACK_TO_HOME: "Retour à l'accueil",
+    MAIN_TITLE: "Notre processus de déploiement structuré",
+    INTRO_PARAGRAPH: "Nous avons affiné notre méthodologie de développement pour minimiser les risques et maximiser l'innovation, en veillant à ce que votre solution IT passe efficacement du concept à la réalité.",
+    PROCESS_STEPS: [
+      {
+        id: 1,
+        title: "Compréhension des besoins",
+        description: `Cette première étape vise à établir une vision claire et partagée du projet. Elle consiste à analyser l’environnement du client, comprendre ses enjeux métiers, identifier ses objectifs et déterminer les contraintes techniques ou budgétaires. L’objectif est de poser des bases solides pour une solution réellement adaptée.`,
+        steps: [
+          "Organisation de réunions d’échange avec les parties prenantes",
+          "Analyse de l’existant (infrastructure, logiciels, flux de travail)",
+          "Identification des points de douleur et des opportunités",
+          "Rédaction d’un cahier des charges fonctionnel et technique"
+        ]
+      },
+      {
+        id: 2,
+        title: "Conception de la solution",
+        description: `À partir des besoins identifiés, cette étape permet de concevoir l’architecture de la solution IT. Elle comprend le choix des technologies, la définition des modules fonctionnels, ainsi que la planification globale du projet. C’est ici que la solution prend forme sur le papier.`,
+        steps: [
+          "Élaboration de l’architecture logicielle et réseau",
+          "Sélection des outils, frameworks et plateformes adaptés",
+          "Modélisation des processus (diagrammes, maquettes, wireframes)",
+          "Construction du planning projet (jalons, livrables, ressources nécessaires)"
+        ]
+      },
+      {
+        id: 3,
+        title: "Développement & Intégration",
+        description: `L’étape de mise en œuvre technique où la solution est construite et intégrée à l’environnement IT existant. Elle requiert des tests rigoureux, un contrôle qualité permanent, et une communication continue avec le client.`,
+        steps: [
+          "Développement des composants logiciels, API, bases de données",
+          "Configuration des serveurs, réseaux et environnements cloud",
+          "Intégration avec les systèmes internes ou tiers (ERP, CRM, etc.)",
+          "Réalisation des tests unitaires et tests d’intégration"
+        ]
+      },
+      {
+        id: 4,
+        title: "Déploiement & Mise en production",
+        description: `C’est le moment de rendre la solution pleinement opérationnelle. Elle est installée dans l’environnement final, testée à grande échelle, et les utilisateurs sont accompagnés pour une adoption fluide.`,
+        steps: [
+          "Déploiement dans l’environnement de production",
+          "Exécution des tests de validation (charge, sécurité, stabilité)",
+          "Migration des données et synchronisation des systèmes",
+          "Formation des utilisateurs finaux et livraison de la documentation"
+        ]
+      },
+      {
+        id: 5,
+        title: "Support & Amélioration continue",
+        description: `Une fois la solution en place, le travail continue : garantir la stabilité, corriger les éventuels problèmes, et faire évoluer le système selon les besoins futurs. Cette phase favorise la pérennité de la solution.`,
+        steps: [
+          {
+            type: "link",
+            textBefore: "Mise en place du ",
+            link: { to: "/services/technical-support", label: "support technique" },
+            textAfter: " (helpdesk, supervision)"
+          },
+          "Maintenance corrective et préventive",
+          "Suivi des indicateurs de performance",
+          "Recueil des retours utilisateurs et implémentation d’évolutions."
+        ]
+      }
+    ],
+    CURRENTLY_VIEWING: "actuellement en cours de visualisation",
+    VIEW_DETAILS: "voir les détails",
+    KEY_ACTIVITIES: "Activités clés :",
+    DEVELOPMENT_PRINCIPLE_TITLE: "Notre principe de développement",
+    DEVELOPMENT_PRINCIPLES: [
+      "Itérations rapides pour une amélioration continue",
+      "Communication transparente à chaque étape",
+      "Architecture modulaire et évolutive",
+      "Stratégies de réduction des risques intégrées",
+      "Priorité à l’expérience utilisateur et à l’utilité"
+    ],
+    LOADING_SPINNER_ALT: "Image de remplacement pour l'animation de chargement"
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -26,79 +111,8 @@ const DevelopmentProcess = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const processes = [
-    {
-      id: 1,
-      title: "Compréhension des besoins",
-      description: `Cette première étape vise à établir une vision claire et partagée du projet.
-        Elle consiste à analyser l’environnement du client, comprendre ses enjeux métiers,
-        identifier ses objectifs et déterminer les contraintes techniques ou budgétaires.
-        L’objectif est de poser des bases solides pour une solution réellement adaptée.`,
-      steps: [
-        "Organisation de réunions d’échange avec les parties prenantes",
-        "Analyse de l’existant (infrastructure, logiciels, flux de travail)",
-        "Identification des points de douleur et des opportunités",
-        "Rédaction d’un cahier des charges fonctionnel et technique"
-      ]
-    },
-    {
-      id: 2,
-      title: "Conception de la solution",
-      description: `À partir des besoins identifiés, cette étape permet de concevoir l’architecture de la solution IT.
-        Elle comprend le choix des technologies, la définition des modules fonctionnels, ainsi que la planification
-        globale du projet. C’est ici que la solution prend forme sur le papier.`,
-      steps: [
-        "Élaboration de l’architecture logicielle et réseau",
-        "Sélection des outils, frameworks et plateformes adaptés",
-        "Modélisation des processus (diagrammes, maquettes, wireframes)",
-        "Construction du planning projet (jalons, livrables, ressources nécessaires)"
-      ]
-    },
-    {
-      id: 3,
-      title: "Développement & Intégration",
-      description: `L’étape de mise en œuvre technique où la solution est construite et intégrée à l’environnement IT existant.
-        Elle requiert des tests rigoureux, un contrôle qualité permanent, et une communication continue avec le client.`,
-      steps: [
-        "Développement des composants logiciels, API, bases de données",
-        "Configuration des serveurs, réseaux et environnements cloud",
-        "Intégration avec les systèmes internes ou tiers (ERP, CRM, etc.)",
-        "Réalisation des tests unitaires et tests d’intégration"
-      ]
-    },
-    {
-      id: 4,
-      title: "Déploiement & Mise en production",
-      description: `C’est le moment de rendre la solution pleinement opérationnelle. Elle est installée dans l’environnement final,
-        testée à grande échelle, et les utilisateurs sont accompagnés pour une adoption fluide.`,
-      steps: [
-        "Déploiement dans l’environnement de production",
-        "Exécution des tests de validation (charge, sécurité, stabilité)",
-        "Migration des données et synchronisation des systèmes",
-        "Formation des utilisateurs finaux et livraison de la documentation"
-      ]
-    },
-    {
-      id: 5,
-      title: "Support & Amélioration continue",
-      description: `Une fois la solution en place, le travail continue : garantir la stabilité, corriger les éventuels problèmes,
-        et faire évoluer le système selon les besoins futurs. Cette phase favorise la pérennité de la solution.`,
-      steps: [
-        {
-          type: "link",
-          textBefore: "Mise en place du ",
-          link: { to: "/services/technical-support", label: "support technique" },
-          textAfter: " (helpdesk, supervision)"
-        },
-        "Maintenance corrective et préventive",
-        "Suivi des indicateurs de performance",
-        "Recueil des retours utilisateurs et implémentation d’évolutions."
-      ]
-    }
-  ];
-
   useEffect(() => {
-    processSectionsRef.current = processes.map((_, i) => processSectionsRef.current[i] || null);
+    processSectionsRef.current = TEXT_CONSTANTS.PROCESS_STEPS.map((_, i) => processSectionsRef.current[i] || null);
   }, []);
 
   useEffect(() => {
@@ -152,11 +166,6 @@ const DevelopmentProcess = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const title = "Notre Processus de Déploiement Structuré - Zetoun Labs";
-  const description = `Découvrez notre processus de développement IT structuré, de la compréhension des besoins au support continu,
-    pour des solutions innovantes et efficaces.`;
-  const keywords = ["processus de développement", "déploiement IT", "méthodologie", "gestion de projet", "ZL Technologies"];
-
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
@@ -178,21 +187,20 @@ const DevelopmentProcess = () => {
       </div>
     }>
       <PageLayout>
-        <SEO title={title} description={description} keywords={keywords} />
+        <SEO title={TEXT_CONSTANTS.SEO_TITLE} description={TEXT_CONSTANTS.SEO_DESCRIPTION} keywords={TEXT_CONSTANTS.SEO_KEYWORDS} />
         <section className="pt-24 pb-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
               <Link to="/" className="flex items-center text-gray-500 hover:text-gray-700 mb-8">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Retour à l'accueil
+                {TEXT_CONSTANTS.BACK_TO_HOME}
               </Link>
 
-              <h1 className="text-4xl font-bold mb-8">Notre processus de déploiement structuré</h1>
+              <h1 className="text-4xl font-bold mb-8">{TEXT_CONSTANTS.MAIN_TITLE}</h1>
 
               <div className="prose prose-lg max-w-none">
                 <p className="text-xl text-gray-600 mb-12">
-                  Nous avons affiné notre méthodologie de développement pour minimiser les risques et maximiser l'innovation,
-                  en veillant à ce que votre solution IT passe efficacement du concept à la réalité.
+                  {TEXT_CONSTANTS.INTRO_PARAGRAPH}
                 </p>
 
                 <div className="relative mt-12" ref={processRef} style={{
@@ -201,7 +209,7 @@ const DevelopmentProcess = () => {
                   <div className="hidden md:block absolute top-0 left-1/2 w-0.5 h-full bg-gray-200 -translate-x-1/2"></div>
 
                   <div className="space-y-10 relative">
-                    {processes.map((process, index) => (
+                    {TEXT_CONSTANTS.PROCESS_STEPS.map((process, index) => (
                       <div
                         key={process.id}
                         ref={el => processSectionsRef.current[index] = el}
@@ -231,7 +239,7 @@ const DevelopmentProcess = () => {
                               activeProcess === process.id ? "text-gray-700" : "text-gray-500 hover:text-gray-700"
                             )}
                           >
-                            {activeProcess === process.id ? "actuellement en cours de visualisation" : "voir les détails"}
+                            {activeProcess === process.id ? TEXT_CONSTANTS.CURRENTLY_VIEWING : TEXT_CONSTANTS.VIEW_DETAILS}
                           </button>
                         </div>
 
@@ -242,7 +250,7 @@ const DevelopmentProcess = () => {
                           )}
                           onClick={() => setActiveProcess(process.id)}
                         >
-                          <h4 className="font-semibold mb-3 text-gray-700">Activités clés :</h4>
+                          <h4 className="font-semibold mb-3 text-gray-700">{TEXT_CONSTANTS.KEY_ACTIVITIES}</h4>
                           <ul className="space-y-2">
                             {process.steps.map((step, stepIndex) => (
                               <li key={stepIndex} className="flex items-start">
@@ -270,28 +278,14 @@ const DevelopmentProcess = () => {
                 </div>
 
                 <div className="bg-gray-50 p-8 rounded-lg my-12 border border-gray-100">
-                  <h3 className="text-xl font-semibold mb-4">Notre principe de développement</h3>
+                  <h3 className="text-xl font-semibold mb-4">{TEXT_CONSTANTS.DEVELOPMENT_PRINCIPLE_TITLE}</h3>
                   <ul className="space-y-3">
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-2" />
-                      <span>Itérations rapides pour une amélioration continue</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-2" />
-                      <span>Communication transparente à chaque étape</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-2" />
-                      <span>Architecture modulaire et évolutive</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-2" />
-                      <span>Stratégies de réduction des risques intégrées</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-2" />
-                      <span>Priorité à l’expérience utilisateur et à l’utilité</span>
-                    </li>
+                    {TEXT_CONSTANTS.DEVELOPMENT_PRINCIPLES.map((principle, index) => (
+                      <li key={index} className="flex items-start">
+                        <Check className="h-5 w-5 text-green-500 mt-0.5 mr-2" /> {/* Used Check icon here */}
+                        <span>{principle}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

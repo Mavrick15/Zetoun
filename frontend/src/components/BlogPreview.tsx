@@ -7,6 +7,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+const TEXT_CONSTANTS = {
+  SECTION_TITLE_ICON_ALT: "Icône d'actualités",
+  SECTION_CATEGORY: "Actualités",
+  SECTION_HEADER: "Dernières mises à jour",
+  SECTION_DESCRIPTION: "Explorez nos dernières réflexions sur la technologie, les tendances de l'industrie et l'innovation.",
+  VIEW_ALL_ARTICLES_BUTTON: "Voir tous les articles",
+  PLACEHOLDER_IMAGE_URL: "/placeholder.svg",
+};
+
 const BlogPreview = () => {
   const recentPosts = [...blogPosts]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -18,21 +27,21 @@ const BlogPreview = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Newspaper size={20} className="text-gray-900" />
+              <Newspaper size={20} className="text-gray-900" aria-label={TEXT_CONSTANTS.SECTION_TITLE_ICON_ALT} />
               <span className="text-gray-900 font-medium">
-                Actualités
+                {TEXT_CONSTANTS.SECTION_CATEGORY}
               </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
-              Dernières mises à jour
+              {TEXT_CONSTANTS.SECTION_HEADER}
             </h2>
             <p className="text-gray-700 max-w-xl text-justify">
-              Explorez nos dernières réflexions sur la technologie, les tendances de l'industrie et l'innovation.
+              {TEXT_CONSTANTS.SECTION_DESCRIPTION}
             </p>
           </div>
           <Link to="/blog" className="mt-4 md:mt-0">
             <Button variant="outline" className="group border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white">
-              Voir tous les articles
+              {TEXT_CONSTANTS.VIEW_ALL_ARTICLES_BUTTON}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </Link>
@@ -46,7 +55,7 @@ const BlogPreview = () => {
                   <BlogPostCard
                     title={post.title}
                     excerpt={post.excerpt}
-                    imageUrl={post.imageUrl || '/placeholder.svg'}
+                    imageUrl={post.imageUrl || TEXT_CONSTANTS.PLACEHOLDER_IMAGE_URL}
                     date={post.date}
                     slug={post.slug}
                     category={post.category}
@@ -62,7 +71,7 @@ const BlogPreview = () => {
                 key={post.id}
                 title={post.title}
                 excerpt={post.excerpt}
-                imageUrl={post.imageUrl || '/placeholder.svg'}
+                imageUrl={post.imageUrl || TEXT_CONSTANTS.PLACEHOLDER_IMAGE_URL}
                 date={post.date}
                 slug={post.slug}
                 category={post.category}
@@ -75,7 +84,10 @@ const BlogPreview = () => {
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className={`h-1.5 rounded-full ${i === 0 ? 'w-6 bg-gray-800' : 'w-2 bg-gray-400'}`}
+                  className={cn("h-1.5 rounded-full", {
+                    "w-6 bg-gray-800": i === 0,
+                    "w-2 bg-gray-400": i !== 0,
+                  })}
                 />
               ))}
             </div>

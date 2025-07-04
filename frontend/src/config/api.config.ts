@@ -8,4 +8,6 @@ export const ENDPOINTS = {
   FORMATIONS: '/api/formations',
 
   TELECOM_OPINIONS: '/api/telecom-opinions',
+
+  ENROLLMENTS: '/api/enrollments', // <-- Ajout du endpoint manquant
 };

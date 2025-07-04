@@ -8,6 +8,60 @@ import SEO from '@/components/SEO';
 const VideoSurveillance = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
 
+  const TEXT_CONSTANTS = {
+    SEO_TITLE: "Vidéosurveillance & Sécurité | Installation Caméras - Zetoun Labs",
+    SEO_DESCRIPTION: "Protégez vos locaux avec les solutions de vidéosurveillance de Zetoun Labs à Kinshasa : caméras HD, détection de mouvement, stockage sécurisé et intégration avec systèmes d'alarme.",
+    SEO_KEYWORDS: [
+      'vidéosurveillance',
+      'sécurité',
+      'installation caméras',
+      'caméra HD',
+      'système d alarme',
+      'contrôle accès',
+      'détection mouvement',
+      'stockage vidéo cloud',
+      'Zetoun Labs Kinshasa',
+      'protection locaux'
+    ],
+    BACK_TO_HOME_TEXT: "Retour à l'accueil",
+    PAGE_TITLE: "Vidéosurveillance & Sécurité",
+    INTRO_PARAGRAPH: "Zetoun Labs propose des solutions de vidéosurveillance et sécurité sur mesure à Kinshasa, garantissant la protection de vos biens et de vos locaux grâce à des installations adaptées et performantes.",
+    MAIN_IMAGE_ALT: "",
+    MAIN_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour le centre de surveillance de sécurité vidéo",
+    APPROACH_TITLE: "Notre approche de la sécurité par vidéosurveillance",
+    APPROACH_PARA1: "La sécurité de vos locaux commence par une analyse précise de vos besoins. Nous réalisons une étude complète de votre site pour identifier les points stratégiques et les vulnérabilités potentielles, à Kinshasa et ses environs.",
+    APPROACH_PARA2: "Notre expertise nous permet de vous recommander les équipements les plus adaptés et de concevoir une installation sur mesure, discrète mais efficace, pour une protection optimale de vos biens.",
+    SITE_ANALYSIS_IMAGE_ALT: "",
+    SITE_ANALYSIS_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour l'analyse de site",
+    SOLUTIONS_TITLE: "Nos solutions complètes de sécurité et vidéosurveillance",
+    SOLUTION_CAMERAS_TITLE: "Caméras HD intérieures et extérieures",
+    SOLUTION_CAMERAS_DESC: "Haute résolution, grand angle de vue et résistantes aux intempéries pour une surveillance optimale.",
+    SOLUTION_NIGHT_VISION_TITLE: "Vision nocturne et détection de mouvement avancée",
+    SOLUTION_NIGHT_VISION_DESC: "Enregistrement intelligent déclenché par événements, optimisant l'espace de stockage.",
+    SOLUTION_STORAGE_TITLE: "Stockage sécurisé (Local ou Cloud)",
+    SOLUTION_STORAGE_DESC: "Conservation des données conforme à la réglementation avec sauvegarde automatique et récupération rapide.",
+    SOLUTION_REMOTE_ACCESS_TITLE: "Accès à distance via smartphone et alertes",
+    SOLUTION_REMOTE_ACCESS_DESC: "Application mobile sécurisée pour une surveillance en temps réel et des notifications immédiates.",
+    SOLUTION_INTEGRATION_TITLE: "Intégration avec systèmes d'alarme et infogérance",
+    SOLUTION_INTEGRATION_DESC_PART1: "Coordination automatisée entre votre vidéosurveillance et votre système d'alarme. Pensez aussi à notre service d'",
+    SOLUTION_INTEGRATION_DESC_LINK_TEXT: "infogérance IT",
+    SOLUTION_INTEGRATION_DESC_PART2: ".",
+    SOLUTION_ACCESS_CONTROL_TITLE: "Contrôle d'accès et identification avancée",
+    SOLUTION_ACCESS_CONTROL_DESC: "Solutions incluant reconnaissance faciale, badges et capteurs biométriques pour une sécurité renforcée.",
+    CARD1_IMAGE_ALT: "",
+    CARD1_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour la caméra HD",
+    CARD1_TITLE: "Équipements de pointe",
+    CARD1_DESCRIPTION: "Caméras HD avec fonctions avancées de détection et vision nocturne.",
+    CARD2_IMAGE_ALT: "",
+    CARD2_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour le centre de contrôle de sécurité",
+    CARD2_TITLE: "Surveillance centralisée",
+    CARD2_DESCRIPTION: "Monitoring en temps réel et accès à l'historique des événements sécurisés.",
+    CARD3_IMAGE_ALT: "",
+    CARD3_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour le système de contrôle d'accès",
+    CARD3_TITLE: "Contrôle d'accès intégré",
+    CARD3_DESCRIPTION: "Solutions sécurisées et évolutives pour la gestion des accès à vos locaux.",
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
 
@@ -46,21 +100,9 @@ const VideoSurveillance = () => {
       <div className="min-h-screen bg-white">
         <PageLayout>
           <SEO
-            title="Vidéosurveillance & Sécurité | Installation Caméras - Zetoun Labs"
-            description="Protégez vos locaux avec les solutions de vidéosurveillance de Zetoun Labs à Kinshasa :
-            caméras HD, détection de mouvement, stockage sécurisé et intégration avec systèmes d'alarme."
-            keywords={[
-              'vidéosurveillance',
-              'sécurité',
-              'installation caméras',
-              'caméra HD',
-              'système d alarme',
-              'contrôle accès',
-              'détection mouvement',
-              'stockage vidéo cloud',
-              'Zetoun Labs Kinshasa',
-              'protection locaux'
-            ]}
+            title={TEXT_CONSTANTS.SEO_TITLE}
+            description={TEXT_CONSTANTS.SEO_DESCRIPTION}
+            keywords={TEXT_CONSTANTS.SEO_KEYWORDS}
             imageUrl="../lovable-uploads/services/1a.png"
           />
 
@@ -69,7 +111,7 @@ const VideoSurveillance = () => {
               <div className="max-w-6xl mx-auto">
                 <Link to="/" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-6 transition-colors">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Retour à l'accueil
+                  {TEXT_CONSTANTS.BACK_TO_HOME_TEXT}
                 </Link>
 
                 <motion.div
@@ -81,7 +123,7 @@ const VideoSurveillance = () => {
                   <div className="bg-red-100 p-4 rounded-full">
                     <Camera className="h-8 w-8 text-red-600" />
                   </div>
-                  <h1 className="text-4xl font-bold">Vidéosurveillance & Sécurité</h1>
+                  <h1 className="text-4xl font-bold">{TEXT_CONSTANTS.PAGE_TITLE}</h1>
                 </motion.div>
 
                 <motion.p
@@ -90,8 +132,7 @@ const VideoSurveillance = () => {
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="text-xl text-gray-600 mb-8"
                 >
-                  Zetoun Labs propose des solutions de vidéosurveillance et sécurité sur mesure à Kinshasa,
-                  garantissant la protection de vos biens et de vos locaux grâce à des installations adaptées et performantes.
+                  {TEXT_CONSTANTS.INTRO_PARAGRAPH}
                 </motion.p>
 
                 <motion.div
@@ -102,12 +143,12 @@ const VideoSurveillance = () => {
                 >
                   <img
                     src="../lovable-uploads/services/1a.png"
-                    alt="[Image of Video Surveillance Center]"
+                    alt={TEXT_CONSTANTS.MAIN_IMAGE_ALT}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
                       e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Surveillance+Vidéo";
-                      e.currentTarget.alt = "Image de remplacement pour le centre de surveillance de sécurité vidéo";
+                      e.currentTarget.alt = TEXT_CONSTANTS.MAIN_IMAGE_PLACEHOLDER_ALT;
                     }}
                   />
                 </motion.div>
@@ -119,25 +160,22 @@ const VideoSurveillance = () => {
                     transition={{ duration: 0.6, delay: 0.3 }}
                     className="bg-red-50 p-8 rounded-xl border border-red-100 shadow-sm hover:shadow-md transition-shadow"
                   >
-                    <h2 className="text-2xl font-semibold mb-4 text-red-700">Notre approche de la sécurité par vidéosurveillance</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-red-700">{TEXT_CONSTANTS.APPROACH_TITLE}</h2>
                     <p className="text-gray-700 mb-4">
-                      La sécurité de vos locaux commence par une analyse précise de vos besoins. Nous réalisons une étude
-                      complète de votre site pour identifier les points stratégiques et les vulnérabilités potentielles, à
-                      Kinshasa et ses environs.
+                      {TEXT_CONSTANTS.APPROACH_PARA1}
                     </p>
                     <p className="text-gray-700 mb-4">
-                      Notre expertise nous permet de vous recommander les équipements les plus adaptés et de concevoir une
-                      installation sur mesure, discrète mais efficace, pour une protection optimale de vos biens.
+                      {TEXT_CONSTANTS.APPROACH_PARA2}
                     </p>
                     <div className="mt-6 rounded-lg overflow-hidden">
                       <img
                         src="../lovable-uploads/services/1b.png"
-                        alt="[Image of Site Analysis]"
+                        alt={TEXT_CONSTANTS.SITE_ANALYSIS_IMAGE_ALT}
                         className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
                           e.currentTarget.onerror = null;
                           e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Analyse+Site";
-                          e.currentTarget.alt = "Image de remplacement pour l'analyse de site";
+                          e.currentTarget.alt = TEXT_CONSTANTS.SITE_ANALYSIS_IMAGE_PLACEHOLDER_ALT;
                         }}
                       />
                     </div>
@@ -149,56 +187,54 @@ const VideoSurveillance = () => {
                     transition={{ duration: 0.6, delay: 0.5 }}
                     className="space-y-6"
                   >
-                    <h2 className="text-2xl font-semibold mb-4 text-red-700">Nos solutions complètes de sécurité et vidéosurveillance</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-red-700">{TEXT_CONSTANTS.SOLUTIONS_TITLE}</h2>
                     <ul className="space-y-4 text-lg">
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-red-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Caméras HD intérieures et extérieures</span>
-                          <p className="text-gray-600 text-base mt-1">Haute résolution, grand angle de vue et résistantes
-                            aux intempéries pour une surveillance optimale.</p>
+                          <span className="font-medium">{TEXT_CONSTANTS.SOLUTION_CAMERAS_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_CAMERAS_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-red-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Vision nocturne et détection de mouvement avancée</span>
-                          <p className="text-gray-600 text-base mt-1">Enregistrement intelligent déclenché par événements,
-                            optimisant l'espace de stockage.</p>
+                          <span className="font-medium">{TEXT_CONSTANTS.SOLUTION_NIGHT_VISION_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_NIGHT_VISION_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-red-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Stockage sécurisé (Local ou Cloud)</span>
-                          <p className="text-gray-600 text-base mt-1">Conservation des données conforme à la
-                            réglementation avec sauvegarde automatique et récupération rapide.</p>
+                          <span className="font-medium">{TEXT_CONSTANTS.SOLUTION_STORAGE_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_STORAGE_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-red-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Accès à distance via smartphone et alertes</span>
-                          <p className="text-gray-600 text-base mt-1">Application mobile sécurisée pour une surveillance
-                            en temps réel et des notifications immédiates.</p>
+                          <span className="font-medium">{TEXT_CONSTANTS.SOLUTION_REMOTE_ACCESS_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_REMOTE_ACCESS_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-red-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Intégration avec systèmes d'alarme et infogérance</span>
-                          <p className="text-gray-600 text-base mt-1">Coordination automatisée entre votre
-                            vidéosurveillance et votre système d'alarme. Pensez aussi à notre service d'
-                            <Link to="/services/it-management" className="text-red-600 hover:underline font-semibold">infogérance IT</Link>.
+                          <span className="font-medium">{TEXT_CONSTANTS.SOLUTION_INTEGRATION_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">
+                            {TEXT_CONSTANTS.SOLUTION_INTEGRATION_DESC_PART1}
+                            <Link to="/services/it-management" className="text-red-600 hover:underline font-semibold">
+                              {TEXT_CONSTANTS.SOLUTION_INTEGRATION_DESC_LINK_TEXT}
+                            </Link>
+                            {TEXT_CONSTANTS.SOLUTION_INTEGRATION_DESC_PART2}
                           </p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-red-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Contrôle d'accès et identification avancée</span>
-                          <p className="text-gray-600 text-base mt-1">Solutions incluant reconnaissance faciale, badges
-                            et capteurs biométriques pour une sécurité renforcée.</p>
+                          <span className="font-medium">{TEXT_CONSTANTS.SOLUTION_ACCESS_CONTROL_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_ACCESS_CONTROL_DESC}</p>
                         </div>
                       </li>
                     </ul>
@@ -214,17 +250,17 @@ const VideoSurveillance = () => {
                   >
                     <img
                       src="/lovable-uploads/services/1c.png"
-                      alt="[Image of HD Camera]"
+                      alt={TEXT_CONSTANTS.CARD1_IMAGE_ALT}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Caméra+HD";
-                        e.currentTarget.alt = "Image de remplacement pour la caméra HD";
+                        e.currentTarget.alt = TEXT_CONSTANTS.CARD1_IMAGE_PLACEHOLDER_ALT;
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-red-700">Équipements de pointe</h3>
-                      <p className="text-gray-600 text-sm">Caméras HD avec fonctions avancées de détection et vision nocturne.</p>
+                      <h3 className="text-lg font-medium text-red-700">{TEXT_CONSTANTS.CARD1_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{TEXT_CONSTANTS.CARD1_DESCRIPTION}</p>
                     </div>
                   </motion.div>
 
@@ -236,17 +272,17 @@ const VideoSurveillance = () => {
                   >
                     <img
                       src="/lovable-uploads/services/1d.png"
-                      alt="[Image of Control Center]"
+                      alt={TEXT_CONSTANTS.CARD2_IMAGE_ALT}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Centre+Contrôle";
-                        e.currentTarget.alt = "Image de remplacement pour le centre de contrôle de sécurité";
+                        e.currentTarget.alt = TEXT_CONSTANTS.CARD2_IMAGE_PLACEHOLDER_ALT;
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-red-700">Surveillance centralisée</h3>
-                      <p className="text-gray-600 text-sm">Monitoring en temps réel et accès à l'historique des événements sécurisés.</p>
+                      <h3 className="text-lg font-medium text-red-700">{TEXT_CONSTANTS.CARD2_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{TEXT_CONSTANTS.CARD2_DESCRIPTION}</p>
                     </div>
                   </motion.div>
 
@@ -258,17 +294,17 @@ const VideoSurveillance = () => {
                   >
                     <img
                       src="/lovable-uploads/services/1e.png"
-                      alt="[Image of Access Control]"
+                      alt={TEXT_CONSTANTS.CARD3_IMAGE_ALT}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Contrôle+Accès";
-                        e.currentTarget.alt = "Image de remplacement pour le système de contrôle d'accès";
+                        e.currentTarget.alt = TEXT_CONSTANTS.CARD3_IMAGE_PLACEHOLDER_ALT;
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-red-700">Contrôle d'accès intégré</h3>
-                      <p className="text-gray-600 text-sm">Solutions sécurisées et évolutives pour la gestion des accès à vos locaux.</p>
+                      <h3 className="text-lg font-medium text-red-700">{TEXT_CONSTANTS.CARD3_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{TEXT_CONSTANTS.CARD3_DESCRIPTION}</p>
                     </div>
                   </motion.div>
                 </div>

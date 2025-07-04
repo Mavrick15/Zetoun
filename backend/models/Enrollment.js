@@ -1,60 +1,93 @@
 const mongoose = require('mongoose');
 
+const VALIDATION_MESSAGES = {
+  REQUIRED: 'Champ requis',
+  INVALID_EMAIL: 'Veuillez entrer une adresse email valide',
+  MIN_VALUE: 'La valeur doit être positive',
+  INVALID_ENUM: 'Valeur invalide',
+};
+
+const ENUM_VALUES = {
+  LEVELS: ['Débutant', 'Intermédiaire', 'Avancé'],
+};
+
 const enrollmentSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    immutable: true
   },
-  userName: { // Nouveau champ pour le nom de l'utilisateur
+  userName: {
     type: String,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    trim: true
   },
-  userEmail: { // Nouveau champ pour l'email de l'utilisateur
+  userEmail: {
     type: String,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    trim: true,
+    lowercase: true,
+    match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, VALIDATION_MESSAGES.INVALID_EMAIL]
   },
   formation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Formation',
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    immutable: true
   },
-  formationTitle: { // Nouveau champ pour le titre de la formation
+  formationTitle: {
     type: String,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    trim: true
   },
-  formationDate: { // Nouveau champ pour la date de la formation
-    type: String, // Ou Date, selon le format stocké dans Formation
-    required: true
-  },
-  formationLocation: { // Nouveau champ pour le lieu de la formation
+  formationDate: {
     type: String,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED]
   },
-  formationDuration: { // Nouveau champ pour la durée de la formation
+  formationLocation: {
     type: String,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    trim: true
   },
-  formationInstructor: { // Nouveau champ pour l'instructeur de la formation
+  formationDuration: {
     type: String,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    trim: true
   },
-  formationPrice: { // Nouveau champ pour le prix de la formation
-    type: String, // Ou Number, selon le format stocké dans Formation
-    required: true
+  formationInstructor: {
+    type: String,
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    trim: true
   },
-  formationSeats: { // Nouveau champ pour les places de la formation (au moment de l'enrôlement)
+  formationPrice: {
     type: Number,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    min: [0, VALIDATION_MESSAGES.MIN_VALUE]
   },
-  formationLevel: { // Nouveau champ pour le niveau de la formation
+  formationSeats: {
+    type: Number,
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    min: [0, VALIDATION_MESSAGES.MIN_VALUE]
+  },
+  formationLevel: {
     type: String,
-    required: true
+    required: [true, VALIDATION_MESSAGES.REQUIRED],
+    enum: {
+      values: ENUM_VALUES.LEVELS,
+      message: VALIDATION_MESSAGES.INVALID_ENUM
+    },
+    trim: true
   },
   enrolledAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    immutable: true
   }
+}, {
+  timestamps: true
 });
+
+enrollmentSchema.index({ user: 1, formation: 1 }, { unique: true });
 
 module.exports = mongoose.model('Enrollment', enrollmentSchema);

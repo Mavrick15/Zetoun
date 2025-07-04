@@ -1,7 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import React from 'react'; // Explicitly import React
+import React from 'react';
+
+const TEXT_CONSTANTS = {
+  DEFAULT_AUTHOR: "Zetoun Labs",
+  DEFAULT_CATEGORY: "Actualités",
+  PLACEHOLDER_IMAGE_URL: "https://placehold.co/800x256/cccccc/333333?text=Article+Image",
+  PLACEHOLDER_IMAGE_ALT_PREFIX: "Image de remplacement pour l'article: ",
+};
 
 interface BlogPostProps {
   title: string;
@@ -12,25 +19,25 @@ interface BlogPostProps {
   imageUrl?: string;
 }
 
-const BlogPost = ({ 
-  title, 
-  content, 
-  date = new Date(), 
-  author = "Zetoun Labs", // Corrected author name for consistency
-  category = "Actualités", 
-  imageUrl 
+const BlogPost = ({
+  title,
+  content,
+  date = new Date(),
+  author = TEXT_CONSTANTS.DEFAULT_AUTHOR,
+  category = TEXT_CONSTANTS.DEFAULT_CATEGORY,
+  imageUrl
 }: BlogPostProps) => {
   return (
     <Card className="overflow-hidden mb-8">
       {imageUrl && (
-        <div 
+        <div
           className="w-full h-64 bg-cover bg-center"
           style={{ backgroundImage: `url(${imageUrl})` }}
           onError={(e) => {
             // Fallback to a placeholder if the image fails to load
             e.currentTarget.onerror = null; // Prevents infinite loops if placeholder also fails
-            e.currentTarget.style.backgroundImage = `url('https://placehold.co/800x256/cccccc/333333?text=Article+Image')`;
-            e.currentTarget.title = `Image de remplacement pour l'article: ${title}`;
+            e.currentTarget.style.backgroundImage = `url('${TEXT_CONSTANTS.PLACEHOLDER_IMAGE_URL}')`;
+            e.currentTarget.title = `${TEXT_CONSTANTS.PLACEHOLDER_IMAGE_ALT_PREFIX}${title}`;
           }}
         />
       )}
@@ -42,7 +49,7 @@ const BlogPost = ({
             </span>
           </div>
           <div className="text-sm text-gray-500">
-            {format(date, "d MMMM yyyy", { locale: fr })} • 
+            {format(date, "d MMMM yyyy", { locale: fr })} •
             <span className="ml-1">{author}</span>
           </div>
         </div>
@@ -63,4 +70,3 @@ const BlogPost = ({
 };
 
 export default BlogPost;
-

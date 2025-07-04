@@ -13,11 +13,42 @@ import PageLayout from '@/components/PageLayout';
 import SEO from '@/components/SEO';
 import { motion } from "framer-motion";
 
+// Constants for the Login component
+const TEXT_CONSTANTS = {
+  LOADING_PROGRESS_INTERVAL_MS: 200,
+  INITIAL_LOADING_PROGRESS_STEP: 5,
+  MAX_LOADING_PROGRESS: 95,
+  LOGIN_DELAY_MS: 700,
+  API_LOGIN_ENDPOINT: "/api/auth/login",
+  NAV_CALENDAR_FORM: '/add/calendar-form',
+  NAV_SIGNUP: '/signup',
+
+  MESSAGES: {
+    EMAIL_INVALID: 'Veuillez entrer une adresse email valide',
+    PASSWORD_REQUIRED: 'Le mot de passe est requis',
+    LOGIN_SUCCESS_TITLE: "Connexion réussie",
+    LOGIN_SUCCESS_DESCRIPTION: "Vous êtes maintenant connecté à votre compte.",
+    LOGIN_ERROR_TITLE: "Erreur de connexion",
+    LOGIN_ERROR_INVALID_CREDENTIALS: 'Identifiants invalides. Veuillez réessayer.',
+    NETWORK_ERROR_TITLE: "Erreur réseau",
+    NETWORK_ERROR_DESCRIPTION: "Impossible de se connecter au serveur. Veuillez vérifier votre connexion.",
+    LOGIN_IN_PROGRESS: "Connexion en cours...",
+    LOGIN_BUTTON: "Se connecter",
+    NO_ACCOUNT_QUESTION: "Pas encore de compte ?",
+    SIGNUP_LINK: "Inscrivez-vous",
+    PAGE_TITLE: "Connexion - Zetoun Labs",
+    PAGE_DESCRIPTION: "Connectez-vous pour accéder à notre calendrier des formations en télécommunication",
+    HEADING: "Connexion",
+    SUBHEADING: "Connectez-vous pour accéder à notre calendrier des formations",
+  },
+  LOADING_SPINNER_ALT: "Animation de chargement",
+};
+
 const formSchema = z.object({
   email: z.string()
-    .email({ message: 'Veuillez entrer une adresse email valide' }),
+    .email({ message: TEXT_CONSTANTS.MESSAGES.EMAIL_INVALID }),
   password: z.string()
-    .min(1, { message: 'Le mot de passe est requis' }),
+    .min(1, { message: TEXT_CONSTANTS.MESSAGES.PASSWORD_REQUIRED }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -32,12 +63,12 @@ const Login = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setLoadingProgress((prevProgress) => {
-        if (prevProgress < 95) {
-          return prevProgress + 5;
+        if (prevProgress < TEXT_CONSTANTS.MAX_LOADING_PROGRESS) {
+          return prevProgress + TEXT_CONSTANTS.INITIAL_LOADING_PROGRESS_STEP;
         }
         return prevProgress;
       });
-    }, 200);
+    }, TEXT_CONSTANTS.LOADING_PROGRESS_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, []);
@@ -55,11 +86,9 @@ const Login = () => {
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, TEXT_CONSTANTS.LOGIN_DELAY_MS));
 
-      const apiUrl = "/api/auth/login";
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch(TEXT_CONSTANTS.API_LOGIN_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,26 +105,26 @@ const Login = () => {
         }));
 
         toast({
-          title: "Connexion réussie",
-          description: "Vous êtes maintenant connecté à votre compte.",
+          title: TEXT_CONSTANTS.MESSAGES.LOGIN_SUCCESS_TITLE,
+          description: TEXT_CONSTANTS.MESSAGES.LOGIN_SUCCESS_DESCRIPTION,
         });
 
-        navigate('/add/calendar-form');
+        navigate(TEXT_CONSTANTS.NAV_CALENDAR_FORM);
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Identifiants invalides. Veuillez réessayer.');
+        setError(errorData.message || TEXT_CONSTANTS.MESSAGES.LOGIN_ERROR_INVALID_CREDENTIALS);
         toast({
-          title: "Erreur de connexion",
-          description: errorData.message || "Une erreur est survenue lors de la connexion.",
+          title: TEXT_CONSTANTS.MESSAGES.LOGIN_ERROR_TITLE,
+          description: errorData.message || TEXT_CONSTANTS.MESSAGES.LOGIN_ERROR_INVALID_CREDENTIALS,
           variant: "destructive",
         });
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Impossible de se connecter au serveur. Veuillez vérifier votre connexion.');
+      setError(TEXT_CONSTANTS.MESSAGES.NETWORK_ERROR_DESCRIPTION);
       toast({
-        title: "Erreur réseau",
-        description: "Impossible de se connecter au serveur. Veuillez vérifier votre connexion.",
+        title: TEXT_CONSTANTS.MESSAGES.NETWORK_ERROR_TITLE,
+        description: TEXT_CONSTANTS.MESSAGES.NETWORK_ERROR_DESCRIPTION,
         variant: "destructive",
       });
     } finally {
@@ -125,8 +154,8 @@ const Login = () => {
     }>
       <PageLayout showContact={false}>
         <SEO
-          title="Connexion - Zetoun Labs"
-          description="Connectez-vous pour accéder à notre calendrier des formations en télécommunication"
+          title={TEXT_CONSTANTS.MESSAGES.PAGE_TITLE}
+          description={TEXT_CONSTANTS.MESSAGES.PAGE_DESCRIPTION}
         />
 
         <motion.div
@@ -148,7 +177,7 @@ const Login = () => {
                 transition={{ duration: 0.5 }}
                 className="text-3xl font-bold text-gray-900 font-space"
               >
-                Connexion
+                {TEXT_CONSTANTS.MESSAGES.HEADING}
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
@@ -156,7 +185,7 @@ const Login = () => {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="mt-2 text-sm text-gray-600"
               >
-                Connectez-vous pour accéder à notre calendrier des formations
+                {TEXT_CONSTANTS.MESSAGES.SUBHEADING}
               </motion.p>
             </div>
 
@@ -217,11 +246,11 @@ const Login = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Connexion en cours...
+                        {TEXT_CONSTANTS.MESSAGES.LOGIN_IN_PROGRESS}
                       </>
                     ) : (
                       <>
-                        Se connecter <LogIn className="ml-2 h-4 w-4" />
+                        {TEXT_CONSTANTS.MESSAGES.LOGIN_BUTTON} <LogIn className="ml-2 h-4 w-4" />
                       </>
                     )}
                   </Button>
@@ -230,13 +259,13 @@ const Login = () => {
 
               <div className="mt-6 text-center text-sm">
                 <p className="text-gray-600">
-                  Pas encore de compte ?
+                  {TEXT_CONSTANTS.MESSAGES.NO_ACCOUNT_QUESTION}
                   <Button
                     variant="link"
-                    onClick={() => navigate('/signup')}
+                    onClick={() => navigate(TEXT_CONSTANTS.NAV_SIGNUP)}
                     className="p-0 ml-2 text-blue-600 hover:text-blue-500"
                   >
-                    Inscrivez-vous
+                    {TEXT_CONSTANTS.MESSAGES.SIGNUP_LINK}
                   </Button>
                 </p>
               </div>

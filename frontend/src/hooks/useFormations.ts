@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ENDPOINTS } from '@/config/api.config'; // API_URL n'est plus nécessaire ici
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ENDPOINTS } from '@/config/api.config';
 
 export interface Formation {
   _id: string;
@@ -9,7 +9,7 @@ export interface Formation {
   location: string;
   duration: string;
   instructor: string;
-  price: string;
+  price: string; // Keeping as string based on your schema and seeder
   seats: number;
   level: string;
   image?: string;
@@ -51,41 +51,60 @@ const useFormations = ({
     offset: initialOffset,
     pages: 0,
   });
-  
-  const fetchFormations = async (offset = initialOffset) => {
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Effect for debouncing search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // Debounce for 500ms
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  const fetchFormations = useCallback(async (offset: number) => {
+    // Abort any ongoing fetch requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     try {
       setLoading(true);
-      
-      // Build query parameters
+      setError(null); // Clear previous errors
+
       const params = new URLSearchParams();
       params.append('limit', limit.toString());
       params.append('offset', offset.toString());
-      
-      if (searchTerm) params.append('search', searchTerm);
+
+      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
       if (levelFilter) params.append('level', levelFilter);
       if (locationFilter) params.append('location', locationFilter);
-      
-      // Utilisation du chemin relatif pour l'API, comme défini dans api.config.ts
-      const response = await fetch(`${ENDPOINTS.FORMATIONS}?${params.toString()}`);
-      
+
+      const response = await fetch(`${ENDPOINTS.FORMATIONS}?${params.toString()}`, { signal });
+
       if (!response.ok) {
-        // Si la réponse n'est pas OK (statut HTTP 4xx ou 5xx),
-        // tente de lire le corps de la réponse comme du texte pour un message d'erreur plus précis.
-        const errorText = await response.text();
-        console.error(`Erreur HTTP ${response.status}: ${errorText}`);
-        // Limite la longueur du message pour éviter un affichage trop long
-        throw new Error(`Erreur du serveur (${response.status}): ${errorText.substring(0, 100)}...`);
+        const errorBody = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
+        const errorMessage = errorBody.message || `Erreur du serveur (${response.status})`;
+        console.error(`Erreur HTTP ${response.status}:`, errorBody);
+        throw new Error(errorMessage);
       }
-      
-      // Tente de parser la réponse en JSON
+
       const data: FormationsResponse = await response.json();
-      
+
       setFormations(data.formations);
       setPagination(data.pagination);
-      setError(null);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.log('Fetch aborted:', err.message);
+        return; // Do not set error state if fetch was intentionally aborted
+      }
       console.error('Erreur lors du chargement des formations:', err);
-      // Différencie les types d'erreurs pour fournir un message plus clair à l'utilisateur
+
       if (err instanceof SyntaxError) {
         setError('Impossible de lire la réponse du serveur. Format de données inattendu.');
       } else if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
@@ -93,29 +112,39 @@ const useFormations = ({
       } else {
         setError(err.message || 'Une erreur est survenue lors du chargement des formations.');
       }
-      setFormations([]);
+      setFormations([]); // Clear formations on error
     } finally {
       setLoading(false);
+      abortControllerRef.current = null; // Reset controller after fetch completes or aborts
     }
-  };
-  
-  const goToPage = (page: number) => {
+  }, [limit, debouncedSearchTerm, levelFilter, locationFilter]); // Dependencies for useCallback
+
+  const goToPage = useCallback((page: number) => {
     const newOffset = (page - 1) * pagination.limit;
-    fetchFormations(newOffset);
-  };
-  
-  // Initial fetch des formations lors du montage du composant ou changement des filtres
+    if (newOffset !== pagination.offset) { // Only fetch if offset actually changes
+      fetchFormations(newOffset);
+    }
+  }, [pagination.limit, pagination.offset, fetchFormations]);
+
+  // Initial fetch and re-fetch on filter/limit changes
   useEffect(() => {
-    fetchFormations();
-  }, [searchTerm, levelFilter, locationFilter, limit]); // Dépendances pour recharger les formations
-  
+    fetchFormations(initialOffset);
+
+    // Cleanup function to abort fetch on unmount
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [fetchFormations, initialOffset]); // Dependencies for initial fetch
+
   return {
     formations,
     loading,
     error,
     pagination,
     goToPage,
-    refetch: fetchFormations, // Permet de recharger les formations manuellement
+    refetch: () => fetchFormations(pagination.offset), // Refetch current page
   };
 };
 

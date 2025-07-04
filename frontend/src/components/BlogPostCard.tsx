@@ -1,7 +1,15 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+
+// Constantes pour le composant BlogPostCard
+const TEXT_CONSTANTS = {
+  PLACEHOLDER_IMAGE_URL: "https://placehold.co/400x200/cccccc/333333?text=Image+de+Blog",
+  PLACEHOLDER_IMAGE_ALT_PREFIX: "Image de remplacement pour l'article: ",
+  READ_MORE_BUTTON_TEXT: "Continuer la lecture",
+};
 
 interface BlogPostCardProps {
   title: string;
@@ -29,8 +37,8 @@ const BlogPostCard = ({
             style={{ backgroundImage: `url('${imageUrl}')` }}
             onError={(e) => {
               // Fallback to a placeholder if the image fails to load
-              e.currentTarget.style.backgroundImage = `url('https://placehold.co/400x200/cccccc/333333?text=Blog+Image')`;
-              e.currentTarget.title = `Image de remplacement pour l'article: ${title}`;
+              e.currentTarget.style.backgroundImage = `url('${TEXT_CONSTANTS.PLACEHOLDER_IMAGE_URL}')`;
+              e.currentTarget.title = `${TEXT_CONSTANTS.PLACEHOLDER_IMAGE_ALT_PREFIX}${title}`;
             }}
           >
             <div className="w-full h-full bg-black/20 flex items-center justify-center">
@@ -50,7 +58,7 @@ const BlogPostCard = ({
               {excerpt}
             </p>
             <Button variant="outline" className="group mt-auto">
-              Continuer la lecture 
+              {TEXT_CONSTANTS.READ_MORE_BUTTON_TEXT}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </CardContent>

@@ -2,33 +2,17 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 
-interface SEOProps {
-  title?: string;
-  description?: string;
-  type?: string;
-  name?: string;
-  imageUrl?: string;
-  publishDate?: string;
-  modifiedDate?: string;
-  author?: string;
-  category?: string;
-  keywords?: string[]; // La prop keywords recevra les mots-clés spécifiques de la page
-  isBlogPost?: boolean;
-}
-
-const SEO: React.FC<SEOProps> = ({
-  title = 'Zetoun Labs - Services IT & Formations', // Titre par défaut mis à jour
-  description = `Zetoun Labs : Votre partenaire expert en services IT (support, réseau, vidéosurveillance, web, infogérance, solaire)
-    et formations professionnelles (Linux, Windows, Cisco, virtualisation, maintenance PC).`, // Description par défaut mise à jour
-  type = 'website',
-  name = 'Zetoun Labs', // Nom de l'organisation mis à jour
-  imageUrl = '/lovable-uploads/icon.svg', // Assurez-vous que c'est bien l'icône de Zetoun Labs
-  publishDate,
-  modifiedDate,
-  author,
-  category,
-  // Mots-clés par défaut pour l'ensemble du site (à affiner par page)
-  keywords = [
+// Constantes pour les textes et valeurs par défaut du composant SEO
+const SEO_TEXT_CONSTANTS = {
+  DEFAULT_TITLE: 'Zetoun Labs - Services IT & Formations',
+  DEFAULT_DESCRIPTION: `Zetoun Labs : Votre partenaire expert en services IT (support, réseau, vidéosurveillance, web, infogérance, solaire) et formations professionnelles (Linux, Windows, Cisco, virtualisation, maintenance PC).`,
+  ORGANIZATION_NAME: 'Zetoun Labs',
+  ORGANIZATION_URL: 'https://zetounlabs.com',
+  ORGANIZATION_LOGO_PATH: '/lovable-uploads/logo-zetoun-labs.png',
+  ORGANIZATION_DESCRIPTION: 'Zetoun Labs : Votre partenaire en services IT et formations professionnelles à Kinshasa.',
+  CONTACT_EMAIL: 'contact@zetounlabs.com',
+  DEFAULT_IMAGE_PATH: '/lovable-uploads/icon.svg',
+  DEFAULT_KEYWORDS: [
     'services IT',
     'formation IT',
     'support technique',
@@ -42,38 +26,65 @@ const SEO: React.FC<SEOProps> = ({
     'formation réseau Cisco',
     'formation virtualisation',
     'startup tech',
-    'Kinshasa', // Si votre cible est Kinshasa
+    'Kinshasa',
     'Zetoun Labs'
   ],
+  LINKEDIN_URL: 'https://www.linkedin.com/company/zetoun-labs',
+  TWITTER_URL: 'https://twitter.com/zetounlabs',
+};
+
+interface SEOProps {
+  title?: string;
+  description?: string;
+  type?: string;
+  name?: string;
+  imageUrl?: string;
+  publishDate?: string;
+  modifiedDate?: string;
+  author?: string;
+  category?: string;
+  keywords?: string[];
+  isBlogPost?: boolean;
+}
+
+const SEO: React.FC<SEOProps> = ({
+  title = SEO_TEXT_CONSTANTS.DEFAULT_TITLE,
+  description = SEO_TEXT_CONSTANTS.DEFAULT_DESCRIPTION,
+  type = 'website',
+  name = SEO_TEXT_CONSTANTS.ORGANIZATION_NAME,
+  imageUrl = SEO_TEXT_CONSTANTS.DEFAULT_IMAGE_PATH,
+  publishDate,
+  modifiedDate,
+  author,
+  category,
+  keywords = SEO_TEXT_CONSTANTS.DEFAULT_KEYWORDS,
   isBlogPost = false
 }) => {
   const location = useLocation();
-  // Assurez-vous que l'URL de base est bien celle de votre site pour Zetoun Labs
-  const baseUrl = 'https://zetounlabs.com'; // Corrected base URL to Zetoun Labs domain
+  const baseUrl = SEO_TEXT_CONSTANTS.ORGANIZATION_URL;
   const currentUrl = `${baseUrl}${location.pathname}`;
   const absoluteImageUrl = imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
 
-  // --- Mise à jour de l'Objet Organization JSON-LD ---
+  // Organization JSON-LD Structured Data
   const organizationStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Zetoun Labs', // Nom de l'organisation mis à jour
-    url: 'https://zetounlabs.com', // URL de Zetoun Labs (à vérifier et modifier si différente)
-    logo: `${baseUrl}/lovable-uploads/logo-zetoun-labs.png`, // Chemin vers le logo de Zetoun Labs (à vérifier)
-    description: 'Zetoun Labs : Votre partenaire en services IT et formations professionnelles à Kinshasa.', // Description mise à jour
+    name: SEO_TEXT_CONSTANTS.ORGANIZATION_NAME,
+    url: SEO_TEXT_CONSTANTS.ORGANIZATION_URL,
+    logo: `${baseUrl}${SEO_TEXT_CONSTANTS.ORGANIZATION_LOGO_PATH}`,
+    description: SEO_TEXT_CONSTANTS.ORGANIZATION_DESCRIPTION,
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      email: 'contact@zetounlabs.com' // Email de contact de Zetoun Labs (à vérifier)
+      email: SEO_TEXT_CONSTANTS.CONTACT_EMAIL
     },
     sameAs: [
-      // Liens vers les réseaux sociaux de Zetoun Labs (exemples à vérifier et modifier)
-      'https://www.linkedin.com/company/zetoun-labs',
-      'https://twitter.com/zetounlabs'
+      SEO_TEXT_CONSTANTS.LINKEDIN_URL,
+      SEO_TEXT_CONSTANTS.TWITTER_URL
     ]
   };
 
-  // --- Mise à jour de l'Objet BlogPosting JSON-LD ---
+  // BlogPosting JSON-LD Structured Data (conditionally rendered)
   const blogPostStructuredData = isBlogPost && publishDate ? {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -87,21 +98,21 @@ const SEO: React.FC<SEOProps> = ({
     dateModified: modifiedDate || publishDate,
     author: {
       '@type': 'Organization',
-      name: author || 'Zetoun Labs' // Nom de l'auteur par défaut ou de l'organisation
+      name: author || SEO_TEXT_CONSTANTS.ORGANIZATION_NAME
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Zetoun Labs', // Nom de l'éditeur mis à jour
+      name: SEO_TEXT_CONSTANTS.ORGANIZATION_NAME,
       logo: {
         '@type': 'ImageObject',
-        url: `${baseUrl}/lovable-uploads/logo-zetoun-labs.png` // Chemin du logo de l'éditeur (Zetoun Labs)
+        url: `${baseUrl}${SEO_TEXT_CONSTANTS.ORGANIZATION_LOGO_PATH}`
       }
     },
     description: description,
-    keywords: keywords.join(', ') // Les mots-clés spécifiques de la page sont déjà passés
+    keywords: keywords.join(', ')
   } : null;
 
-  // Combine keywords avec tout terme de catégorie additionnel
+  // Combine keywords with any additional category term
   const keywordString = category
     ? [...keywords, category.toLowerCase()].join(', ')
     : keywords.join(', ');

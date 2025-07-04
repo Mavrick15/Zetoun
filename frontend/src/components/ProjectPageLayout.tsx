@@ -5,12 +5,17 @@ import PageLayout from '@/components/PageLayout';
 import { useEffect } from 'react';
 import SEO from '@/components/SEO'; // Importez le composant SEO
 
+// Constantes pour le composant ProjectPageLayout
+const TEXT_CONSTANTS = {
+  BACK_BUTTON: "Retour à l'accueil",
+};
+
 interface ProjectPageLayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle: string;
   imageUrl: string;
-  brandName: string;
+  brandName: string; // This prop is not used in the current component, but kept for interface consistency.
   darkMode?: boolean;
 }
 
@@ -32,7 +37,8 @@ const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
 
   return (
     <PageLayout>
-      <SEO title={title} description={subtitle} /> {/* Composant SEO ajouté ici */}
+      {/* SEO component for meta tags */}
+      <SEO title={title} description={subtitle} />
       <div className="pt-16 pb-16">
         {/* Hero Section */}
         <div
@@ -43,6 +49,7 @@ const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${imageUrl})` }}
           ></div>
+          {/* Overlay for readability */}
           <div className={`absolute inset-0 ${darkMode ? 'bg-black/70' : 'bg-white/70'}`}></div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 z-10">
@@ -82,7 +89,7 @@ const ProjectPageLayout: React.FC<ProjectPageLayoutProps> = ({
         <div className="w-full max-w-4xl mx-auto px-6 md:px-8 mt-8">
           <Link to="/#projects" className="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            <span>Retour à l'accueil</span>
+            <span>{TEXT_CONSTANTS.BACK_BUTTON}</span>
           </Link>
         </div>
 

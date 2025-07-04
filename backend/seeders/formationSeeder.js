@@ -2,10 +2,16 @@ const mongoose = require('mongoose');
 const Formation = require('../models/Formation');
 const connectDB = require('../config/db');
 const dotenv = require('dotenv');
+const { logger } = require('../log/logger');
 
 dotenv.config();
 
-connectDB();
+(function checkMongoURI() {
+  if (!process.env.MONGODB_URI) {
+    logger.error('ERREUR CRITIQUE : MONGODB_URI n\'est pas définie dans votre fichier .env.');
+    process.exit(1);
+  }
+})();
 
 const formationData = [
   {
@@ -684,15 +690,26 @@ const formationData = [
 
 const seedFormations = async () => {
   try {
-    await Formation.deleteMany();
-    console.log('Anciennes formations supprimées.');
+    await connectDB();
+    logger.info('Connexion à la base de données établie pour le seeder.');
 
-    const createdFormations = await Formation.insertMany(formationData);
-    console.log(`${createdFormations.length} formations insérées avec succès.`);
+    const processedFormationData = formationData.map(formation => {
+      const cleanedPrice = formation.price.replace(/[$,]/g, '');
+      return {
+        ...formation,
+        price: parseFloat(cleanedPrice)
+      };
+    });
+
+    await Formation.deleteMany();
+    logger.info('Anciennes formations supprimées avec succès.');
+
+    const createdFormations = await Formation.insertMany(processedFormationData);
+    logger.info(`${createdFormations.length} formations insérées avec succès.`);
 
     process.exit(0);
   } catch (error) {
-    console.error(`Erreur lors de l'insertion des formations : ${error.message}`);
+    logger.error(`Erreur lors de l'insertion des formations : ${error.message}`, { stack: error.stack });
     process.exit(1);
   }
 };

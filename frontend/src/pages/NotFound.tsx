@@ -4,6 +4,23 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
+// Constants for the NotFound component
+const TEXT_CONSTANTS = {
+  LOADING_PROGRESS_INTERVAL_MS: 200,
+  INITIAL_LOADING_PROGRESS_STEP: 5,
+  MAX_LOADING_PROGRESS: 95,
+  HOME_PATH: "/",
+  GO_BACK_BUTTON_TEXT: "Retourner en arrière",
+  GO_HOME_BUTTON_TEXT: "Retourner à l'accueil",
+
+  NOT_FOUND_MESSAGES: {
+    ERROR_LOG_PREFIX: "404 Erreur : L'utilisateur a tenté d'accéder à une route inexistante :",
+    TITLE: "Page introuvable",
+    DESCRIPTION: "Désolé, nous n'avons pas pu trouver la page que vous recherchez.",
+  },
+  LOADING_SPINNER_ALT: "Animation de chargement",
+};
+
 const NotFound = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -12,18 +29,18 @@ const NotFound = () => {
 
   useEffect(() => {
     console.error(
-      "404 Error: User attempted to access non-existent route:",
+      TEXT_CONSTANTS.NOT_FOUND_MESSAGES.ERROR_LOG_PREFIX,
       location.pathname
     );
 
     const interval = setInterval(() => {
       setLoadingProgress((prevProgress) => {
-        if (prevProgress < 95) {
-          return prevProgress + 5;
+        if (prevProgress < TEXT_CONSTANTS.MAX_LOADING_PROGRESS) {
+          return prevProgress + TEXT_CONSTANTS.INITIAL_LOADING_PROGRESS_STEP;
         }
         return prevProgress;
       });
-    }, 200);
+    }, TEXT_CONSTANTS.LOADING_PROGRESS_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, [location.pathname]);
@@ -59,9 +76,9 @@ const NotFound = () => {
                 </div>
 
                 <h1 className="text-5xl font-bold text-gray-900 dark:text-white font-space">404</h1>
-                <p className="mt-3 text-xl font-medium text-gray-700 dark:text-gray-300">Page introuvable</p>
+                <p className="mt-3 text-xl font-medium text-gray-700 dark:text-gray-300">{TEXT_CONSTANTS.NOT_FOUND_MESSAGES.TITLE}</p>
                 <p className="mt-4 text-base text-gray-500 dark:text-gray-400">
-                  Désolé, nous n'avons pas pu trouver la page que vous recherchez.
+                  {TEXT_CONSTANTS.NOT_FOUND_MESSAGES.DESCRIPTION}
                 </p>
 
                 <div className="mt-8 space-y-4">
@@ -69,15 +86,15 @@ const NotFound = () => {
                     className="w-full hover:scale-105 transition-transform"
                     onClick={() => navigate(-1)}
                   >
-                    Retourner en arrière
+                    {TEXT_CONSTANTS.GO_BACK_BUTTON_TEXT}
                   </Button>
 
                   <Button
                     variant="outline"
                     className="w-full hover:bg-gray-100 dark:hover:bg-gray-800"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate(TEXT_CONSTANTS.HOME_PATH)}
                   >
-                    Retourner à l'accueil
+                    {TEXT_CONSTANTS.GO_HOME_BUTTON_TEXT}
                   </Button>
                 </div>
               </div>

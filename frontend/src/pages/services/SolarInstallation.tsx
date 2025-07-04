@@ -1,13 +1,69 @@
+import React, { useEffect, useState, Suspense } from 'react';
 import { ArrowLeft, Sun } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from "framer-motion";
-import { useEffect, useState, Suspense } from 'react';
-import React from 'react';
 import PageLayout from '@/components/PageLayout';
 import SEO from '@/components/SEO';
 
 const SolarInstallation = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
+
+  // Constants for text content
+  const TEXT_CONSTANTS = {
+    SEO_TITLE: "Installation Solaire | Conception & Systèmes - Zetoun Labs",
+    SEO_DESCRIPTION: "Profitez de l'énergie propre à Kinshasa avec Zetoun Labs : conception, installation et maintenance de systèmes photovoltaïques résidentiels et commerciaux.",
+    SEO_KEYWORDS: [
+      'installation solaire',
+      'énergie solaire',
+      'panneaux solaires',
+      'systèmes photovoltaïques',
+      'onduleurs solaires',
+      'batteries solaires',
+      'autoconsommation',
+      'entretien solaire',
+      'audit énergétique',
+      'électricité propre',
+      'Kinshasa',
+      'Zetoun Labs'
+    ],
+    BACK_TO_HOME_TEXT: "Retour à l'accueil",
+    PAGE_TITLE: "Installation Solaire",
+    INTRO_PARAGRAPH: "Zetoun Labs est votre partenaire de confiance à Kinshasa pour la conception et l'installation de systèmes photovoltaïques, vous permettant de bénéficier d'une énergie propre, fiable et économique.",
+    MAIN_IMAGE_ALT: "Panneaux solaires installés sur un toit, produisant de l'énergie propre",
+    MAIN_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour les panneaux solaires",
+    SOLUTIONS_TITLE: "Nos solutions solaires complètes",
+    SOLUTION_AUDIT_TITLE: "Audit énergétique et dimensionnement initial",
+    SOLUTION_AUDIT_DESC: "Analyse de votre consommation et des contraintes spécifiques de votre site à Kinshasa.",
+    SOLUTION_DESIGN_TITLE: "Conception de systèmes photovoltaïques sur mesure",
+    SOLUTION_DESIGN_DESC: "Intégration optimale des panneaux, onduleurs et systèmes de stockage pour une efficacité maximale.",
+    SOLUTION_INSTALLATION_TITLE: "Installation professionnelle et sécurisée",
+    SOLUTION_INSTALLATION_DESC: "Réalisée par des techniciens certifiés, respectant les normes de sécurité et de qualité internationales.",
+    SOLUTION_STORAGE_TITLE: "Solutions de stockage d'énergie (batteries)",
+    SOLUTION_STORAGE_DESC: "Pour une autonomie accrue et une disponibilité d'énergie constante, même en l'absence de soleil.",
+    SOLUTION_MAINTENANCE_TITLE: "Suivi et maintenance préventive",
+    SOLUTION_MAINTENANCE_DESC_PART1: "Assurant la performance, la longévité et la ",
+    SOLUTION_MAINTENANCE_DESC_LINK_TEXT: "maintenance",
+    SOLUTION_MAINTENANCE_DESC_PART2: " de votre installation solaire.",
+    SOLUTION_SMART_HOME_TITLE: "Intégration avec les solutions de maison intelligente",
+    SOLUTION_SMART_HOME_DESC: "Pour une gestion optimisée de votre consommation et de votre production d'énergie.",
+    COMMITMENT_TITLE: "Notre engagement pour une énergie propre",
+    COMMITMENT_PARA1: "Chaque projet solaire est unique. Notre équipe d'experts à Kinshasa s'engage à vous fournir une solution énergétique personnalisée, qui maximise votre production d'énergie, réduit vos coûts et contribue à un avenir plus durable.",
+    COMMITMENT_PARA2: "Nous sélectionnons des équipements de haute qualité et appliquons des techniques d'installation rigoureuses pour garantir la fiabilité et la performance à long terme de votre système solaire.",
+    TECH_IMAGE_ALT: "Ingénieur examinant les données de production d'un système solaire",
+    TECH_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour l'ingénieur solaire",
+    CARD1_IMAGE_ALT: "Maison alimentée par l'énergie solaire, symbolisant l'autonomie",
+    CARD1_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour la maison autonome",
+    CARD1_TITLE: "Autonomie & Économies",
+    CARD1_DESCRIPTION: "Réduisez significativement vos factures d'électricité et gagnez en indépendance énergétique à Kinshasa.",
+    CARD2_IMAGE_ALT: "Panneaux solaires résistants aux intempéries, illustrant la durabilité",
+    CARD2_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour les panneaux fiables",
+    CARD2_TITLE: "Fiabilité et Durabilité",
+    CARD2_DESCRIPTION: "Des systèmes conçus pour durer, offrant une source d'énergie stable et performante sur le long terme.",
+    CARD3_IMAGE_ALT: "Arbre et panneaux solaires, symbolisant l'engagement environnemental",
+    CARD3_IMAGE_PLACEHOLDER_ALT: "Image de remplacement pour l'énergie verte",
+    CARD3_TITLE: "Impact Environnemental Positif",
+    CARD3_DESCRIPTION: "Contribuez à la réduction des émissions de carbone et à la protection de l'environnement.",
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -47,23 +103,9 @@ const SolarInstallation = () => {
       <div className="min-h-screen bg-white font-inter">
         <PageLayout>
           <SEO
-            title="Installation Solaire | Conception & Systèmes - Zetoun Labs"
-            description="Profitez de l'énergie propre à Kinshasa avec Zetoun Labs : conception,
-            installation et maintenance de systèmes photovoltaïques résidentiels et commerciaux."
-            keywords={[
-              'installation solaire',
-              'énergie solaire',
-              'panneaux solaires',
-              'systèmes photovoltaïques',
-              'onduleurs solaires',
-              'batteries solaires',
-              'autoconsommation',
-              'entretien solaire',
-              'audit énergétique',
-              'électricité propre',
-              'Kinshasa',
-              'Zetoun Labs'
-            ]}
+            title={TEXT_CONSTANTS.SEO_TITLE}
+            description={TEXT_CONSTANTS.SEO_DESCRIPTION}
+            keywords={TEXT_CONSTANTS.SEO_KEYWORDS}
             imageUrl="/lovable-uploads/services/panneaux.png"
           />
 
@@ -72,7 +114,7 @@ const SolarInstallation = () => {
               <div className="max-w-6xl mx-auto">
                 <Link to="/" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-6 transition-colors rounded-full p-2">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Retour à l'accueil
+                  {TEXT_CONSTANTS.BACK_TO_HOME_TEXT}
                 </Link>
 
                 <motion.div
@@ -84,7 +126,7 @@ const SolarInstallation = () => {
                   <div className="bg-yellow-100 p-4 rounded-full shadow-lg">
                     <Sun className="h-8 w-8 text-yellow-600" />
                   </div>
-                  <h1 className="text-4xl font-bold text-gray-900">Installation Solaire</h1>
+                  <h1 className="text-4xl font-bold text-gray-900">{TEXT_CONSTANTS.PAGE_TITLE}</h1>
                 </motion.div>
 
                 <motion.p
@@ -93,8 +135,7 @@ const SolarInstallation = () => {
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="text-xl text-gray-700 mb-8 leading-relaxed"
                 >
-                  Zetoun Labs est votre partenaire de confiance à Kinshasa pour la conception et l'installation de
-                  systèmes photovoltaïques, vous permettant de bénéficier d'une énergie propre, fiable et économique.
+                  {TEXT_CONSTANTS.INTRO_PARAGRAPH}
                 </motion.p>
 
                 <motion.div
@@ -105,12 +146,12 @@ const SolarInstallation = () => {
                 >
                   <img
                     src="/lovable-uploads/services/panneaux.png"
-                    alt="Panneaux solaires installés sur un toit, produisant de l'énergie propre"
+                    alt={TEXT_CONSTANTS.MAIN_IMAGE_ALT}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
                       e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Panneaux+Solaires";
-                      e.currentTarget.alt = "Image de remplacement pour les panneaux solaires";
+                      e.currentTarget.alt = TEXT_CONSTANTS.MAIN_IMAGE_PLACEHOLDER_ALT;
                     }}
                   />
                 </motion.div>
@@ -122,54 +163,54 @@ const SolarInstallation = () => {
                     transition={{ duration: 0.6, delay: 0.3 }}
                     className="space-y-6"
                   >
-                    <h2 className="text-2xl font-semibold mb-4 text-yellow-700">Nos solutions solaires complètes</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-yellow-700">{TEXT_CONSTANTS.SOLUTIONS_TITLE}</h2>
                     <ul className="space-y-4 text-lg">
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-yellow-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium text-gray-800">Audit énergétique et dimensionnement initial</span>
-                          <p className="text-gray-600 text-base mt-1">Analyse de votre consommation et des contraintes
-                            spécifiques de votre site à Kinshasa.</p>
+                          <span className="font-medium text-gray-800">{TEXT_CONSTANTS.SOLUTION_AUDIT_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_AUDIT_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-yellow-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium text-gray-800">Conception de systèmes photovoltaïques sur mesure</span>
-                          <p className="text-gray-600 text-base mt-1">Intégration optimale des panneaux, onduleurs et
-                            systèmes de stockage pour une efficacité maximale.</p>
+                          <span className="font-medium text-gray-800">{TEXT_CONSTANTS.SOLUTION_DESIGN_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_DESIGN_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-yellow-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium text-gray-800">Installation professionnelle et sécurisée</span>
-                          <p className="text-gray-600 text-base mt-1">Réalisée par des techniciens certifiés,
-                            respectant les normes de sécurité et de qualité internationales.</p>
+                          <span className="font-medium text-gray-800">{TEXT_CONSTANTS.SOLUTION_INSTALLATION_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_INSTALLATION_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-yellow-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium text-gray-800">Solutions de stockage d'énergie (batteries)</span>
-                          <p className="text-gray-600 text-base mt-1">Pour une autonomie accrue et une disponibilité
-                            d'énergie constante, même en l'absence de soleil.</p>
+                          <span className="font-medium text-gray-800">{TEXT_CONSTANTS.SOLUTION_STORAGE_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_STORAGE_DESC}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-yellow-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium text-gray-800">Suivi et maintenance préventive</span>
-                          <p className="text-gray-600 text-base mt-1">Assurant la performance, la longévité et la <Link to="/services/technical-support" className="text-amber-600 hover:underline font-semibold">maintenance</Link> de votre
-                            installation solaire.</p>
+                          <span className="font-medium text-gray-800">{TEXT_CONSTANTS.SOLUTION_MAINTENANCE_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">
+                            {TEXT_CONSTANTS.SOLUTION_MAINTENANCE_DESC_PART1}
+                            <Link to="/services/technical-support" className="text-amber-600 hover:underline font-semibold">
+                              {TEXT_CONSTANTS.SOLUTION_MAINTENANCE_DESC_LINK_TEXT}
+                            </Link>
+                            {TEXT_CONSTANTS.SOLUTION_MAINTENANCE_DESC_PART2}
+                          </p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-yellow-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium text-gray-800">Intégration avec les solutions de maison intelligente</span>
-                          <p className="text-gray-600 text-base mt-1">Pour une gestion optimisée de votre consommation
-                            et de votre production d'énergie.</p>
+                          <span className="font-medium text-gray-800">{TEXT_CONSTANTS.SOLUTION_SMART_HOME_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{TEXT_CONSTANTS.SOLUTION_SMART_HOME_DESC}</p>
                         </div>
                       </li>
                     </ul>
@@ -182,15 +223,12 @@ const SolarInstallation = () => {
                     className="flex flex-col space-y-8"
                   >
                     <div className="bg-yellow-50 p-8 rounded-xl border border-yellow-100 shadow-sm hover:shadow-md transition-shadow">
-                      <h2 className="text-2xl font-semibold mb-4 text-yellow-700">Notre engagement pour une énergie propre</h2>
+                      <h2 className="text-2xl font-semibold mb-4 text-yellow-700">{TEXT_CONSTANTS.COMMITMENT_TITLE}</h2>
                       <p className="text-gray-700 mb-4">
-                        Chaque projet solaire est unique. Notre équipe d'experts à Kinshasa s'engage à vous fournir une
-                        solution énergétique personnalisée, qui maximise votre production d'énergie, réduit vos coûts
-                        et contribue à un avenir plus durable.
+                        {TEXT_CONSTANTS.COMMITMENT_PARA1}
                       </p>
                       <p className="text-gray-700">
-                        Nous sélectionnons des équipements de haute qualité et appliquons des techniques d'installation
-                        rigoureuses pour garantir la fiabilité et la performance à long terme de votre système solaire.
+                        {TEXT_CONSTANTS.COMMITMENT_PARA2}
                       </p>
                     </div>
 
@@ -202,12 +240,12 @@ const SolarInstallation = () => {
                     >
                       <img
                         src="/lovable-uploads/services/inge.png"
-                        alt="Ingénieur examinant les données de production d'un système solaire"
+                        alt={TEXT_CONSTANTS.TECH_IMAGE_ALT}
                         className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
                           e.currentTarget.onerror = null;
                           e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Ingénieur+Solaire";
-                          e.currentTarget.alt = "Image de remplacement pour l'ingénieur solaire";
+                          e.currentTarget.alt = TEXT_CONSTANTS.TECH_IMAGE_PLACEHOLDER_ALT;
                         }}
                       />
                     </motion.div>
@@ -223,18 +261,17 @@ const SolarInstallation = () => {
                   >
                     <img
                       src="/lovable-uploads/services/home.png"
-                      alt="Maison alimentée par l'énergie solaire, symbolisant l'autonomie"
+                      alt={TEXT_CONSTANTS.CARD1_IMAGE_ALT}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Maison+Autonome";
-                        e.currentTarget.alt = "Image de remplacement pour la maison autonome";
+                        e.currentTarget.alt = TEXT_CONSTANTS.CARD1_IMAGE_PLACEHOLDER_ALT;
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-yellow-700">Autonomie & Économies</h3>
-                      <p className="text-gray-600 text-sm">Réduisez significativement vos factures d'électricité et
-                        gagnez en indépendance énergétique à Kinshasa.</p>
+                      <h3 className="text-lg font-medium text-yellow-700">{TEXT_CONSTANTS.CARD1_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{TEXT_CONSTANTS.CARD1_DESCRIPTION}</p>
                     </div>
                   </motion.div>
 
@@ -246,18 +283,17 @@ const SolarInstallation = () => {
                   >
                     <img
                       src="/lovable-uploads/services/inte.png"
-                      alt="Panneaux solaires résistants aux intempéries, illustrant la durabilité"
+                      alt={TEXT_CONSTANTS.CARD2_IMAGE_ALT}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Panneaux+Fiables";
-                        e.currentTarget.alt = "Image de remplacement pour les panneaux fiables";
+                        e.currentTarget.alt = TEXT_CONSTANTS.CARD2_IMAGE_PLACEHOLDER_ALT;
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-yellow-700">Fiabilité et Durabilité</h3>
-                      <p className="text-gray-600 text-sm">Des systèmes conçus pour durer, offrant une source
-                        d'énergie stable et performante sur le long terme.</p>
+                      <h3 className="text-lg font-medium text-yellow-700">{TEXT_CONSTANTS.CARD2_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{TEXT_CONSTANTS.CARD2_DESCRIPTION}</p>
                     </div>
                   </motion.div>
 
@@ -269,18 +305,17 @@ const SolarInstallation = () => {
                   >
                     <img
                       src="/lovable-uploads/services/energie.png"
-                      alt="Arbre et panneaux solaires, symbolisant l'engagement environnemental"
+                      alt={TEXT_CONSTANTS.CARD3_IMAGE_ALT}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Énergie+Verte";
-                        e.currentTarget.alt = "Image de remplacement pour l'énergie verte";
+                        e.currentTarget.alt = TEXT_CONSTANTS.CARD3_IMAGE_PLACEHOLDER_ALT;
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-yellow-700">Impact Environnemental Positif</h3>
-                      <p className="text-gray-600 text-sm">Contribuez à la réduction des émissions de carbone et à
-                        la protection de l'environnement.</p>
+                      <h3 className="text-lg font-medium text-yellow-700">{TEXT_CONSTANTS.CARD3_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{TEXT_CONSTANTS.CARD3_DESCRIPTION}</p>
                     </div>
                   </motion.div>
                 </div>

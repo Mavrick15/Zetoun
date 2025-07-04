@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import PageLayout from '@/components/PageLayout';
 import SEO from '@/components/SEO';
 import { Link } from 'react-router-dom';
-import { ENDPOINTS } from '@/config/api.config'; // Import ENDPOINTS
+import { ENDPOINTS } from '@/config/api.config';
 
 const ContactNous = () => {
   const [name, setName] = useState('');
@@ -20,21 +20,65 @@ const ContactNous = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
-  const [loadingProgress, setLoadingProgress] = useState(0);
+
+  const TEXT_CONSTANTS = {
+    SEO_TITLE: "Demander un avis - Zetoun Labs",
+    SEO_DESCRIPTION: "Parlez-nous de vos besoins pour bénéficier de notre expertise.",
+    BACK_TO_HOME: "Retour à l'accueil",
+    MAIN_TITLE: "Demander un avis",
+    MAIN_SUBTITLE: "Un spécialiste de notre équipe IT prendra contact avec vous dans les plus brefs délais.",
+    WHY_ASK_TITLE: "Pourquoi demander un avis ?",
+    FEATURES: [
+      {
+        title: "Conseils personnalisés",
+        description: "Nos experts analysent vos besoins spécifiques et vous recommandent les formations les plus adaptées.",
+        icon: <Lightbulb className="h-10 w-10 p-2 bg-amber-100 text-amber-600 rounded-full" />,
+      },
+      {
+        title: "Parcours sur mesure",
+        description: "Obtenez des recommandations pour un parcours de formation optimisé selon vos objectifs professionnels.",
+        icon: <ArrowRight className="h-10 w-10 p-2 bg-green-100 text-green-600 rounded-full" />,
+      },
+      {
+        title: "Solutions entreprise",
+        description: "Découvrez nos offres spécifiques pour les entreprises souhaitant former plusieurs collaborateurs.",
+        icon: <MessageSquare className="h-10 w-10 p-2 bg-blue-100 text-blue-600 rounded-full" />,
+      },
+      {
+        title: "Réponse rapide",
+        description: "Recevez des détails complets sur les prérequis, le contenu et les compétences acquises sous 48h.",
+        icon: <Clock className="h-10 w-10 p-2 bg-purple-100 text-purple-600 rounded-full" />,
+      },
+    ],
+    FORM_TITLE: "Formulaire de contact",
+    FORM_BADGE: "Réponse sous 48h",
+    FORM_DESCRIPTION: "Sollicitez l'expertise de nos spécialistes via ce formulaire.",
+    NAME_LABEL: "Nom",
+    NAME_PLACEHOLDER: "Votre nom",
+    EMAIL_LABEL: "Email",
+    EMAIL_PLACEHOLDER: "votre.email@exemple.com",
+    SUBJECT_LABEL: "Sujet",
+    SUBJECT_PLACEHOLDER: "Sujet de votre demande",
+    MESSAGE_LABEL: "Message",
+    MESSAGE_PLACEHOLDER: "Décrivez votre besoin en détail...",
+    SUBMIT_BUTTON_SENDING: "Envoi en cours...",
+    SUBMIT_BUTTON_TEXT: "Envoyer ma demande",
+    SUBMITTED_THANK_YOU_TITLE: "Merci pour votre demande !",
+    SUBMITTED_THANK_YOU_MESSAGE_PART1: "Merci pour votre message ! Notre équipe reviendra vers vous très vite pour discuter de votre projet ou de vos besoins.",
+    SUBMITTED_THANK_YOU_MESSAGE_PART2: "Un email de confirmation a été envoyé à l'adresse",
+    NEW_REQUEST_BUTTON: "Nouvelle demande",
+    BACK_TO_FORMATIONS_BUTTON: "Retour aux formations",
+    TOAST_SUCCESS_TITLE: "Demande envoyée",
+    TOAST_SUCCESS_DESCRIPTION: "Nous avons bien reçu votre avis et nous vous répondrons dans les plus brefs délais.",
+    TOAST_ERROR_TITLE: "Erreur lors de l'envoi",
+    TOAST_ERROR_NETWORK: "Erreur réseau",
+    TOAST_ERROR_NETWORK_DESCRIPTION: "Impossible de contacter le serveur.",
+    LOADING_TEXT: "Chargement...",
+    LOADING_SPINNER_ALT: "Animation de chargement",
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
-
-    const interval = setInterval(() => {
-      setLoadingProgress((prevProgress) => {
-        if (prevProgress < 95) {
-          return prevProgress + 5;
-        }
-        return prevProgress;
-      });
-    }, 200);
-
-    return () => clearInterval(interval);
   }, []);
 
   const handleSubmit = async (e) => {
@@ -42,9 +86,6 @@ const ContactNous = () => {
     setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Utilisation du chemin relatif via ENDPOINTS
       const response = await fetch(ENDPOINTS.TELECOM_OPINIONS, {
         method: 'POST',
         headers: {
@@ -59,8 +100,8 @@ const ContactNous = () => {
         setIsSubmitting(false);
         setIsSubmitted(true);
         toast({
-          title: "Demande envoyée",
-          description: "Nous avons bien reçu votre avis et nous vous répondrons dans les plus brefs délais.",
+          title: TEXT_CONSTANTS.TOAST_SUCCESS_TITLE,
+          description: TEXT_CONSTANTS.TOAST_SUCCESS_DESCRIPTION,
         });
         setName('');
         setEmail('');
@@ -70,7 +111,7 @@ const ContactNous = () => {
         setIsSubmitting(false);
         toast({
           variant: 'destructive',
-          title: 'Erreur lors de l\'envoi',
+          title: TEXT_CONSTANTS.TOAST_ERROR_TITLE,
           description: data.message || 'Une erreur est survenue lors de l\'enregistrement de votre avis.',
         });
       }
@@ -78,34 +119,11 @@ const ContactNous = () => {
       setIsSubmitting(false);
       toast({
         variant: 'destructive',
-        title: 'Erreur réseau',
-        description: 'Impossible de contacter le serveur.',
+        title: TEXT_CONSTANTS.TOAST_ERROR_NETWORK,
+        description: TEXT_CONSTANTS.TOAST_ERROR_NETWORK_DESCRIPTION,
       });
     }
   };
-
-  const features = [
-    {
-      title: "Conseils personnalisés",
-      description: "Nos experts analysent vos besoins spécifiques et vous recommandent les formations les plus adaptées.",
-      icon: <Lightbulb className="h-10 w-10 p-2 bg-amber-100 text-amber-600 rounded-full" />,
-    },
-    {
-      title: "Parcours sur mesure",
-      description: "Obtenez des recommandations pour un parcours de formation optimisé selon vos objectifs professionnels.",
-      icon: <ArrowRight className="h-10 w-10 p-2 bg-green-100 text-green-600 rounded-full" />,
-    },
-    {
-      title: "Solutions entreprise",
-      description: "Découvrez nos offres spécifiques pour les entreprises souhaitant former plusieurs collaborateurs.",
-      icon: <MessageSquare className="h-10 w-10 p-2 bg-blue-100 text-blue-600 rounded-full" />,
-    },
-    {
-      title: "Réponse rapide",
-      description: "Recevez des détails complets sur les prérequis, le contenu et les compétences acquises sous 48h.",
-      icon: <Clock className="h-10 w-10 p-2 bg-purple-100 text-purple-600 rounded-full" />,
-    },
-  ];
 
   return (
     <Suspense fallback={
@@ -113,24 +131,16 @@ const ContactNous = () => {
         <div className="relative w-28 h-28">
           <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
           <div className="absolute inset-0 rounded-full border-4 border-t-gray-800 border-b-gray-800 border-l-gray-400 border-r-gray-400 animate-spin"></div>
-          <div
-            className="absolute inset-2 rounded-full bg-gray-50 flex items-center justify-center"
-            style={{
-              clipPath: `inset(${100 - loadingProgress}% 0 0 0)`,
-              backgroundColor: 'rgba(0, 0, 0, 0.05)',
-              transition: 'clip-path 0.2s ease-out'
-            }}
-          ></div>
           <div className="absolute inset-0 flex items-center justify-center text-gray-900 text-2xl font-bold">
-            {loadingProgress}%
+            {TEXT_CONSTANTS.LOADING_TEXT}
           </div>
         </div>
       </div>
     }>
       <PageLayout>
         <SEO
-          title="Demander un avis - Zetoun Labs"
-          description="Parlez-nous de vos besoins pour bénéficier de notre expertise."
+          title={TEXT_CONSTANTS.SEO_TITLE}
+          description={TEXT_CONSTANTS.SEO_DESCRIPTION}
         />
 
         <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
@@ -138,7 +148,7 @@ const ContactNous = () => {
             <div className="max-w-6xl mx-auto">
               <Link to="/" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-6 transition-colors">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Retour à l'accueil
+                {TEXT_CONSTANTS.BACK_TO_HOME}
               </Link>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -146,9 +156,9 @@ const ContactNous = () => {
                 transition={{ duration: 0.6 }}
                 className="text-center mb-12"
               >
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-space">Demander un avis</h1>
+                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-space">{TEXT_CONSTANTS.MAIN_TITLE}</h1>
                 <p className="text-lg sm:text-xl text-gray-600">
-                  Un spécialiste de notre équipe IT prendra contact avec vous dans les plus brefs délais.
+                  {TEXT_CONSTANTS.MAIN_SUBTITLE}
                 </p>
               </motion.div>
 
@@ -160,9 +170,9 @@ const ContactNous = () => {
                   className="order-2 md:order-1 mt-8 md:mt-0"
                 >
                   <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-full">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-6">Pourquoi demander un avis ?</h2>
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-6">{TEXT_CONSTANTS.WHY_ASK_TITLE}</h2>
                     <div className="grid gap-6">
-                      {features.map((feature, index) => (
+                      {TEXT_CONSTANTS.FEATURES.map((feature, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, y: 10 }}
@@ -191,22 +201,22 @@ const ContactNous = () => {
                     <Card className="shadow-lg border-0">
                       <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 pb-6">
                         <div className="flex items-center justify-between mb-2">
-                          <CardTitle className="text-2xl">Formulaire de contact</CardTitle>
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-700 font-medium hover:bg-blue-200">Réponse sous 48h</Badge>
+                          <CardTitle className="text-2xl">{TEXT_CONSTANTS.FORM_TITLE}</CardTitle>
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-700 font-medium hover:bg-blue-200">{TEXT_CONSTANTS.FORM_BADGE}</Badge>
                         </div>
                         <CardDescription className="text-gray-700">
-                          Sollicitez l'expertise de nos spécialistes via ce formulaire.
+                          {TEXT_CONSTANTS.FORM_DESCRIPTION}
                         </CardDescription>
                       </CardHeader>
                       <form onSubmit={handleSubmit}>
                         <CardContent className="space-y-4 pt-6">
                           <div className="space-y-2">
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                              Nom
+                              {TEXT_CONSTANTS.NAME_LABEL}
                             </label>
                             <Input
                               id="name"
-                              placeholder="Votre nom"
+                              placeholder={TEXT_CONSTANTS.NAME_PLACEHOLDER}
                               value={name}
                               onChange={(e) => setName(e.target.value)}
                               required
@@ -215,12 +225,12 @@ const ContactNous = () => {
                           </div>
                           <div className="space-y-2">
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                              Email
+                              {TEXT_CONSTANTS.EMAIL_LABEL}
                             </label>
                             <Input
                               id="email"
                               type="email"
-                              placeholder="votre.email@exemple.com"
+                              placeholder={TEXT_CONSTANTS.EMAIL_PLACEHOLDER}
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                               required
@@ -229,11 +239,11 @@ const ContactNous = () => {
                           </div>
                           <div className="space-y-2">
                             <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-                              Sujet
+                              {TEXT_CONSTANTS.SUBJECT_LABEL}
                             </label>
                             <Input
                               id="subject"
-                              placeholder="Sujet de votre demande"
+                              placeholder={TEXT_CONSTANTS.SUBJECT_PLACEHOLDER}
                               value={subject}
                               onChange={(e) => setSubject(e.target.value)}
                               required
@@ -242,11 +252,11 @@ const ContactNous = () => {
                           </div>
                           <div className="space-y-2">
                             <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                              Message
+                              {TEXT_CONSTANTS.MESSAGE_LABEL}
                             </label>
                             <Textarea
                               id="message"
-                              placeholder="Décrivez votre besoin en détail..."
+                              placeholder={TEXT_CONSTANTS.MESSAGE_PLACEHOLDER}
                               value={message}
                               onChange={(e) => setMessage(e.target.value)}
                               required
@@ -266,7 +276,7 @@ const ContactNous = () => {
                               ) : (
                                 <Send className="mr-2 h-4 w-4" />
                               )}
-                              {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma demande'}
+                              {isSubmitting ? TEXT_CONSTANTS.SUBMIT_BUTTON_SENDING : TEXT_CONSTANTS.SUBMIT_BUTTON_TEXT}
                             </span>
                             <div className="absolute inset-0 bg-blue-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
                           </Button>
@@ -292,23 +302,22 @@ const ContactNous = () => {
                         </div>
 
                         <CardContent className="pt-6 pb-6">
-                          <CardTitle className="text-2xl mb-4">Merci pour votre demande !</CardTitle>
-                          {/* Remplacement de CardDescription par un div pour éviter l'erreur de nesting */}
+                          <CardTitle className="text-2xl mb-4">{TEXT_CONSTANTS.SUBMITTED_THANK_YOU_TITLE}</CardTitle>
                           <div className="text-base text-gray-700">
                             <div className="mb-4">
-                              Merci pour votre message ! Notre équipe reviendra vers vous très vite pour discuter de votre projet ou de vos besoins.
+                              {TEXT_CONSTANTS.SUBMITTED_THANK_YOU_MESSAGE_PART1}
                             </div>
                             <div>
-                              Un email de confirmation a été envoyé à l'adresse <span className="font-medium">{email}</span>.
+                              {TEXT_CONSTANTS.SUBMITTED_THANK_YOU_MESSAGE_PART2} <span className="font-medium">{email}</span>.
                             </div>
                           </div>
                         </CardContent>
                         <CardFooter className="flex flex-col sm:flex-row justify-center gap-4 pt-0 pb-6">
                           <Button variant="outline" onClick={() => setIsSubmitted(false)}>
-                            Nouvelle demande
+                            {TEXT_CONSTANTS.NEW_REQUEST_BUTTON}
                           </Button>
                           <Button onClick={() => window.location.href = "/add/calendar-form"}>
-                            Retour aux formations
+                            {TEXT_CONSTANTS.BACK_TO_FORMATIONS_BUTTON}
                           </Button>
                         </CardFooter>
                       </Card>
@@ -319,7 +328,6 @@ const ContactNous = () => {
             </div>
           </div>
         </section>
-        {/* Section de pied de page mise à jour */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -327,7 +335,6 @@ const ContactNous = () => {
           className="bg-gradient-to-b from-transparent to-black py-8 md:py-12 font-sans text-white text-center"
         >
           <div className="container mx-auto max-w-3xl">
-            {/* Le titre h2 et le bouton ont été supprimés */}
           </div>
         </motion.div>
       </PageLayout>

@@ -1,9 +1,73 @@
 import React, { useEffect, useState, Suspense } from 'react';
-import { ArrowLeft, Monitor } from 'lucide-react';
+import { ArrowLeft, Monitor } from 'lucide-react'; // Seules les icônes utilisées sont importées
 import { Link } from 'react-router-dom';
 import { motion } from "framer-motion";
 import PageLayout from '@/components/PageLayout';
 import SEO from '@/components/SEO';
+
+// Constantes pour le composant ITManagement
+const LOADING_PROGRESS_INTERVAL_MS = 200;
+const INITIAL_LOADING_PROGRESS_STEP = 5;
+const MAX_LOADING_PROGRESS = 95;
+const HOME_PATH = "/";
+
+const IMAGE_PATHS = {
+  MAIN_HERO: "../lovable-uploads/services/1.png",
+  TEAM_IN_ACTION: "../lovable-uploads/services/2.png",
+  DASHBOARD: "../lovable-uploads/services/3.png",
+  DATACENTER_SERVERS: "../lovable-uploads/services/4.png",
+  DATA_PROTECTION: "../lovable-uploads/services/5.jpg",
+};
+
+const PLACEHOLDER_IMAGE_URLS = {
+  MAIN_HERO: "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Infogérance+IT",
+  TEAM_IN_ACTION: "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Équipe+Zetoun+Labs",
+  DASHBOARD: "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Supervision+Réel",
+  DATACENTER_SERVERS: "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Serveurs+Datacenter",
+  DATA_PROTECTION: "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Protection+Données",
+};
+
+const IT_MANAGEMENT_MESSAGES = {
+  RETURN_HOME: "Retour à l'accueil",
+  HEADER_TITLE: "Infogérance IT",
+  HEADER_DESCRIPTION: "Zetoun Labs vous offre des services d'infogérance IT à Kinshasa pour une supervision continue et une maintenance complète de votre infrastructure informatique, garantissant performance et sécurité.",
+  APPROACH_TITLE: "Notre approche de l'infogérance",
+  APPROACH_PARA_1: "L'infogérance représente une solution complète pour déléguer la gestion et l'optimisation de votre système d'information à une équipe d'experts certifiés de Zetoun Labs. Notre service surveille, maintient et optimise votre parc informatique en continu pour vous permettre de vous concentrer pleinement sur votre cœur de métier.",
+  APPROACH_PARA_2: "Nous détectons et résolvons proactivement les problèmes avant qu'ils n'affectent votre activité, garantissant ainsi la continuité de vos opérations et la sécurité de vos données.",
+  SERVICES_TITLE: "Services clés de notre infogérance IT",
+  SERVICE_MONITORING_TITLE: "Monitoring 24/7 et alertes proactives",
+  SERVICE_MONITORING_DESCRIPTION: "Surveillance continue de vos serveurs, réseaux et applications critiques pour une détection rapide des anomalies.",
+  SERVICE_INCIDENT_TITLE: "Gestion des incidents et support réactif",
+  SERVICE_INCIDENT_DESCRIPTION: "Détection et résolution rapide des problèmes techniques pour minimiser les interruptions. Voir aussi notre service de",
+  SERVICE_INCIDENT_LINK_TEXT: "Support Technique",
+  SERVICE_INCIDENT_LINK_PATH: "/services/technical-support",
+  SERVICE_BACKUP_TITLE: "Sauvegarde et restauration sécurisées",
+  SERVICE_BACKUP_DESCRIPTION: "Protection et récupération de vos données essentielles avec des stratégies robustes de sauvegarde et restauration.",
+  SERVICE_UPDATES_TITLE: "Mises à jour et correctifs de sécurité",
+  SERVICE_UPDATES_DESCRIPTION: "Maintien à jour de vos systèmes pour garantir la sécurité, la performance et la conformité. Inclut la",
+  SERVICE_UPDATES_LINK_TEXT: "Maintenance informatique",
+  SERVICE_UPDATES_LINK_PATH: "/formations/computer-maintenance",
+  SERVICE_REPORTING_TITLE: "Reporting détaillé et optimisation continue",
+  SERVICE_REPORTING_DESCRIPTION: "Rapports réguliers sur la performance et documentation technique de votre infrastructure pour une visibilité complète.",
+  SERVICE_RISK_MANAGEMENT_TITLE: "Gestion proactive des risques et optimisation",
+  SERVICE_RISK_MANAGEMENT_DESCRIPTION: "Anticipation des problèmes potentiels et optimisation continue de votre infrastructure IT pour une efficacité maximale.",
+  SUPERVISION_CARD_TITLE: "Supervision en temps réel",
+  SUPERVISION_CARD_DESCRIPTION: "Tableaux de bord et alertes personnalisées 24/7 pour une réactivité optimale.",
+  INFRASTRUCTURE_CARD_TITLE: "Infrastructure sécurisée",
+  INFRASTRUCTURE_CARD_DESCRIPTION: "Gestion complète de vos serveurs, incluant la sécurité des données et des systèmes.",
+  CONTINUITY_CARD_TITLE: "Continuité d'activité",
+  CONTINUITY_CARD_DESCRIPTION: "Solutions robustes de sauvegarde, de reprise d'activité et de reprise après sinistre.",
+};
+
+const SEO_METADATA = {
+  TITLE: "Infogérance IT | Supervision & Maintenance Informatique - Zetoun Labs",
+  DESCRIPTION: "Déléguez la gestion de votre SI à Zetoun Labs à Kinshasa : monitoring 24/7, gestion proactive des incidents, sauvegarde sécurisée, restauration et maintenance informatique complète.",
+  KEYWORDS: [
+    'infogérance', 'gestion IT', 'maintenance informatique', 'supervision 24/7', 'sauvegarde données',
+    'restauration système', 'support informatique', 'gestion incidents IT', 'Zetoun Labs Kinshasa', 'services IT Kinshasa'
+  ],
+  IMAGE_URL: IMAGE_PATHS.MAIN_HERO,
+};
 
 const ITManagement = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -13,12 +77,12 @@ const ITManagement = () => {
 
     const interval = setInterval(() => {
       setLoadingProgress((prevProgress) => {
-        if (prevProgress < 95) {
-          return prevProgress + 5;
+        if (prevProgress < MAX_LOADING_PROGRESS) {
+          return prevProgress + INITIAL_LOADING_PROGRESS_STEP;
         }
         return prevProgress;
       });
-    }, 200);
+    }, LOADING_PROGRESS_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, []);
@@ -46,22 +110,18 @@ const ITManagement = () => {
       <div className="min-h-screen bg-white">
         <PageLayout>
           <SEO
-            title="Infogérance IT | Supervision & Maintenance Informatique - Zetoun Labs"
-            description="Déléguez la gestion de votre SI à Zetoun Labs à Kinshasa : monitoring 24/7, gestion proactive des incidents,
-            sauvegarde sécurisée, restauration et maintenance informatique complète."
-            keywords={[
-              'infogérance', 'gestion IT', 'maintenance informatique', 'supervision 24/7', 'sauvegarde données',
-              'restauration système', 'support informatique', 'gestion incidents IT', 'Zetoun Labs Kinshasa', 'services IT Kinshasa'
-            ]}
-            imageUrl="../lovable-uploads/services/1.png"
+            title={SEO_METADATA.TITLE}
+            description={SEO_METADATA.DESCRIPTION}
+            keywords={SEO_METADATA.KEYWORDS}
+            imageUrl={SEO_METADATA.IMAGE_URL}
           />
 
           <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
             <div className="container mx-auto">
               <div className="max-w-6xl mx-auto">
-                <Link to="/" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+                <Link to={HOME_PATH} className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-6 transition-colors">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Retour à l'accueil
+                  {IT_MANAGEMENT_MESSAGES.RETURN_HOME}
                 </Link>
 
                 <motion.div
@@ -73,7 +133,7 @@ const ITManagement = () => {
                   <div className="bg-purple-100 p-4 rounded-full">
                     <Monitor className="h-8 w-8 text-purple-600" />
                   </div>
-                  <h1 className="text-4xl font-bold">Infogérance IT</h1>
+                  <h1 className="text-4xl font-bold">{IT_MANAGEMENT_MESSAGES.HEADER_TITLE}</h1>
                 </motion.div>
 
                 <motion.p
@@ -82,8 +142,7 @@ const ITManagement = () => {
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="text-xl text-gray-600 mb-8"
                 >
-                  Zetoun Labs vous offre des services d'infogérance IT à Kinshasa pour une supervision continue et une
-                  maintenance complète de votre infrastructure informatique, garantissant performance et sécurité.
+                  {IT_MANAGEMENT_MESSAGES.HEADER_DESCRIPTION}
                 </motion.p>
 
                 <motion.div
@@ -93,13 +152,13 @@ const ITManagement = () => {
                   className="w-full h-64 md:h-80 mb-12 overflow-hidden rounded-xl"
                 >
                   <img
-                    src="../lovable-uploads/services/1.png"
-                    alt="Centre de supervision informatique et de gestion IT"
+                    src={IMAGE_PATHS.MAIN_HERO}
+                    alt=""
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
-                      e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Infogérance+IT";
-                      e.currentTarget.alt = "Image de remplacement pour l'infogérance IT";
+                      e.currentTarget.src = PLACEHOLDER_IMAGE_URLS.MAIN_HERO;
+                      e.currentTarget.alt = "[Image de remplacement pour l'infogérance IT]";
                     }}
                   />
                 </motion.div>
@@ -111,26 +170,22 @@ const ITManagement = () => {
                     transition={{ duration: 0.6, delay: 0.3 }}
                     className="bg-purple-50 p-8 rounded-xl border border-purple-100 shadow-sm hover:shadow-md transition-shadow"
                   >
-                    <h2 className="text-2xl font-semibold mb-4 text-purple-700">Notre approche de l'infogérance</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-purple-700">{IT_MANAGEMENT_MESSAGES.APPROACH_TITLE}</h2>
                     <p className="text-gray-700 mb-4">
-                      L'infogérance représente une solution complète pour déléguer la gestion et l'optimisation de votre
-                      système d'information à une équipe d'experts certifiés de Zetoun Labs. Notre service surveille,
-                      maintient et optimise votre parc informatique en continu pour vous permettre de vous concentrer
-                      pleinement sur votre cœur de métier.
+                      {IT_MANAGEMENT_MESSAGES.APPROACH_PARA_1}
                     </p>
                     <p className="text-gray-700 mb-4">
-                      Nous détectons et résolvons proactivement les problèmes avant qu'ils n'affectent votre activité,
-                      garantissant ainsi la continuité de vos opérations et la sécurité de vos données.
+                      {IT_MANAGEMENT_MESSAGES.APPROACH_PARA_2}
                     </p>
                     <div className="mt-6 rounded-lg overflow-hidden">
                       <img
-                        src="../lovable-uploads/services/2.png"
-                        alt="Équipe informatique de Zetoun Labs en action pour l'infogérance"
+                        src={IMAGE_PATHS.TEAM_IN_ACTION}
+                        alt=""
                         className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
                           e.currentTarget.onerror = null;
-                          e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Équipe+Zetoun+Labs";
-                          e.currentTarget.alt = "Image de remplacement pour l'équipe Zetoun Labs";
+                          e.currentTarget.src = PLACEHOLDER_IMAGE_URLS.TEAM_IN_ACTION;
+                          e.currentTarget.alt = "[Image de remplacement pour l'équipe Zetoun Labs]";
                         }}
                       />
                     </div>
@@ -142,58 +197,54 @@ const ITManagement = () => {
                     transition={{ duration: 0.6, delay: 0.5 }}
                     className="space-y-6"
                   >
-                    <h2 className="text-2xl font-semibold mb-4 text-purple-700">Services clés de notre infogérance IT</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-purple-700">{IT_MANAGEMENT_MESSAGES.SERVICES_TITLE}</h2>
                     <ul className="space-y-4 text-lg">
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-purple-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Monitoring 24/7 et alertes proactives</span>
-                          <p className="text-gray-600 text-base mt-1">Surveillance continue de vos serveurs, réseaux et
-                            applications critiques pour une détection rapide des anomalies.</p>
+                          <span className="font-medium">{IT_MANAGEMENT_MESSAGES.SERVICE_MONITORING_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{IT_MANAGEMENT_MESSAGES.SERVICE_MONITORING_DESCRIPTION}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-purple-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Gestion des incidents et support réactif</span>
-                          <p className="text-gray-600 text-base mt-1">Détection et résolution rapide des problèmes techniques
-                            pour minimiser les interruptions. Voir aussi notre service de 
-                            <Link to="/services/technical-support" className="text-purple-600 hover:underline font-semibold"> Support Technique</Link>.
+                          <span className="font-medium">{IT_MANAGEMENT_MESSAGES.SERVICE_INCIDENT_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">
+                            {IT_MANAGEMENT_MESSAGES.SERVICE_INCIDENT_DESCRIPTION}
+                            <Link to={IT_MANAGEMENT_MESSAGES.SERVICE_INCIDENT_LINK_PATH} className="text-purple-600 hover:underline font-semibold"> {IT_MANAGEMENT_MESSAGES.SERVICE_INCIDENT_LINK_TEXT}</Link>.
                           </p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-purple-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Sauvegarde et restauration sécurisées</span>
-                          <p className="text-gray-600 text-base mt-1">Protection et récupération de vos données essentielles
-                            avec des stratégies robustes de sauvegarde et restauration.</p>
+                          <span className="font-medium">{IT_MANAGEMENT_MESSAGES.SERVICE_BACKUP_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{IT_MANAGEMENT_MESSAGES.SERVICE_BACKUP_DESCRIPTION}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-purple-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Mises à jour et correctifs de sécurité</span>
-                          <p className="text-gray-600 text-base mt-1">Maintien à jour de vos systèmes pour garantir la sécurité,
-                            la performance et la conformité. Inclut la
-                            <Link to="/formations/computer-maintenance" className="text-purple-600 hover:underline font-semibold"> Maintenance informatique</Link>.
+                          <span className="font-medium">{IT_MANAGEMENT_MESSAGES.SERVICE_UPDATES_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">
+                            {IT_MANAGEMENT_MESSAGES.SERVICE_UPDATES_DESCRIPTION}
+                            <Link to={IT_MANAGEMENT_MESSAGES.SERVICE_UPDATES_LINK_PATH} className="text-purple-600 hover:underline font-semibold"> {IT_MANAGEMENT_MESSAGES.SERVICE_UPDATES_LINK_TEXT}</Link>.
                           </p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-purple-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Reporting détaillé et optimisation continue</span>
-                          <p className="text-gray-600 text-base mt-1">Rapports réguliers sur la performance et documentation
-                            technique de votre infrastructure pour une visibilité complète.</p>
+                          <span className="font-medium">{IT_MANAGEMENT_MESSAGES.SERVICE_REPORTING_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{IT_MANAGEMENT_MESSAGES.SERVICE_REPORTING_DESCRIPTION}</p>
                         </div>
                       </li>
                       <li className="flex items-start hover:-translate-y-1 transition-transform duration-300">
                         <span className="text-purple-500 font-bold mr-3 text-xl">•</span>
                         <div>
-                          <span className="font-medium">Gestion proactive des risques et optimisation</span>
-                          <p className="text-gray-600 text-base mt-1">Anticipation des problèmes potentiels et optimisation
-                            continue de votre infrastructure IT pour une efficacité maximale.</p>
+                          <span className="font-medium">{IT_MANAGEMENT_MESSAGES.SERVICE_RISK_MANAGEMENT_TITLE}</span>
+                          <p className="text-gray-600 text-base mt-1">{IT_MANAGEMENT_MESSAGES.SERVICE_RISK_MANAGEMENT_DESCRIPTION}</p>
                         </div>
                       </li>
                     </ul>
@@ -208,18 +259,18 @@ const ITManagement = () => {
                     className="bg-purple-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                   >
                     <img
-                      src="../lovable-uploads/services/3.png"
-                      alt="Dashboard de supervision en temps réel pour l'infogérance"
+                      src={IMAGE_PATHS.DASHBOARD}
+                      alt=""
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Supervision+Réel";
-                        e.currentTarget.alt = "Image de remplacement pour la supervision en temps réel";
+                        e.currentTarget.src = PLACEHOLDER_IMAGE_URLS.DASHBOARD;
+                        e.currentTarget.alt = "[Image de remplacement pour la supervision en temps réel]";
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-purple-700">Supervision en temps réel</h3>
-                      <p className="text-gray-600 text-sm">Tableaux de bord et alertes personnalisées 24/7 pour une réactivité optimale.</p>
+                      <h3 className="text-lg font-medium text-purple-700">{IT_MANAGEMENT_MESSAGES.SUPERVISION_CARD_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{IT_MANAGEMENT_MESSAGES.SUPERVISION_CARD_DESCRIPTION}</p>
                     </div>
                   </motion.div>
 
@@ -230,18 +281,18 @@ const ITManagement = () => {
                     className="bg-purple-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                   >
                     <img
-                      src="../lovable-uploads/services/4.png"
-                      alt="Serveurs en datacenter sous gestion d'infogérance"
+                      src={IMAGE_PATHS.DATACENTER_SERVERS}
+                      alt=""
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Serveurs+Datacenter";
-                        e.currentTarget.alt = "Image de remplacement pour les serveurs en datacenter";
+                        e.currentTarget.src = PLACEHOLDER_IMAGE_URLS.DATACENTER_SERVERS;
+                        e.currentTarget.alt = "[Image de remplacement pour les serveurs en datacenter]";
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-purple-700">Infrastructure sécurisée</h3>
-                      <p className="text-gray-600 text-sm">Gestion complète de vos serveurs, incluant la sécurité des données et des systèmes.</p>
+                      <h3 className="text-lg font-medium text-purple-700">{IT_MANAGEMENT_MESSAGES.INFRASTRUCTURE_CARD_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{IT_MANAGEMENT_MESSAGES.INFRASTRUCTURE_CARD_DESCRIPTION}</p>
                     </div>
                   </motion.div>
 
@@ -252,18 +303,18 @@ const ITManagement = () => {
                     className="bg-purple-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                   >
                     <img
-                      src="../lovable-uploads/services/5.jpg"
-                      alt="Protection des données et solutions de sauvegarde"
+                      src={IMAGE_PATHS.DATA_PROTECTION}
+                      alt=""
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = "https://placehold.co/600x400/e0e0e0/6a6a6a?text=Protection+Données";
-                        e.currentTarget.alt = "Image de remplacement pour la protection des données";
+                        e.currentTarget.src = PLACEHOLDER_IMAGE_URLS.DATA_PROTECTION;
+                        e.currentTarget.alt = "[Image de remplacement pour la protection des données]";
                       }}
                     />
                     <div className="p-4">
-                      <h3 className="text-lg font-medium text-purple-700">Continuité d'activité</h3>
-                      <p className="text-gray-600 text-sm">Solutions robustes de sauvegarde, de reprise d'activité et de reprise après sinistre.</p>
+                      <h3 className="text-lg font-medium text-purple-700">{IT_MANAGEMENT_MESSAGES.CONTINUITY_CARD_TITLE}</h3>
+                      <p className="text-gray-600 text-sm">{IT_MANAGEMENT_MESSAGES.CONTINUITY_CARD_DESCRIPTION}</p>
                     </div>
                   </motion.div>
                 </div>

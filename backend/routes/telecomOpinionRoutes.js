@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { createTelecomOpinion } = require('../controllers/telecomOpinionController');
-const { body, validationResult } = require('express-validator'); // Import de body et validationResult
+const { body, validationResult } = require('express-validator');
 
-// Middleware de validation pour l'opinion télécom
 const validateTelecomOpinion = [
   body('name').notEmpty().withMessage('Le nom est requis'),
   body('email').isEmail().withMessage('L\'email doit être valide'),
@@ -18,7 +17,6 @@ const validateTelecomOpinion = [
   },
 ];
 
-// Route pour enregistrer une nouvelle opinion télécom
 router.post('/', validateTelecomOpinion, createTelecomOpinion);
 
 module.exports = router;

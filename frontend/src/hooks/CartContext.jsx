@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { ENDPOINTS } from '@/config/api.config';
 
-const ADD_TO_CART_DELAY_MS = 300;
-const BULK_ENROLL_DELAY_MS = 3000;
-const ENROLLMENT_API_ENDPOINT = '/api/enrollments';
+const ADD_TO_CART_DELAY_MS = 1000;
+const BULK_ENROLL_DELAY_MS = 700;
 
 const TOAST_MESSAGES = {
   ALREADY_IN_CART: {
@@ -47,9 +47,15 @@ const TOAST_MESSAGES = {
   }
 };
 
-const CartContext = createContext();
+const CartContext = createContext(undefined);
 
-export const useCart = () => useContext(CartContext);
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error('useCart doit être utilisé au sein d\'un CartProvider');
+  }
+  return context;
+};
 
 export const CartProvider = ({ children, allFormations }) => {
   const [selectedFormations, setSelectedFormations] = useState(() => {
@@ -79,8 +85,17 @@ export const CartProvider = ({ children, allFormations }) => {
   }, [selectedFormations]);
 
   const addToCart = useCallback(async (formationId) => {
+    if (!formationId) {
+      console.error("ID de formation invalide: undefined");
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "L'identifiant de la formation est invalide."
+      });
+      return;
+    }
+
     if (isCourseInCart(formationId)) {
-      // Notification gérée par le frontend
       toast(TOAST_MESSAGES.ALREADY_IN_CART);
       return;
     }
@@ -90,24 +105,22 @@ export const CartProvider = ({ children, allFormations }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, ADD_TO_CART_DELAY_MS));
       setSelectedFormations((prevSelected) => [...prevSelected, formationId]);
-      // Notification gérée par le frontend
+
       toast(TOAST_MESSAGES.ADD_SUCCESS);
     } catch (error) {
       console.error("Erreur lors de l'ajout au panier:", error);
-      // Notification gérée par le frontend
       toast(TOAST_MESSAGES.ADD_ERROR);
     } finally {
       setEnrollingId(null);
     }
-  }, [isCourseInCart, toast]); // 'toast' est de nouveau une dépendance ici
+  }, [isCourseInCart, toast]);
 
   const removeFromCart = useCallback((formationIdToRemove) => {
     setSelectedFormations((prevSelected) =>
       prevSelected.filter((id) => id !== formationIdToRemove)
     );
-    // Notification gérée par le frontend
     toast(TOAST_MESSAGES.REMOVE_SUCCESS);
-  }, [toast]); // 'toast' est de nouveau une dépendance ici
+  }, [toast]);
 
   const handleBulkEnrollment = useCallback(async () => {
     if (selectedFormations.length === 0) {
@@ -117,7 +130,7 @@ export const CartProvider = ({ children, allFormations }) => {
 
     setIsBulkEnrolling(true);
     let successfulEnrollments = 0;
-    let failedEnrollments = [];
+    const failedEnrollments = [];
 
     await new Promise(resolve => setTimeout(resolve, BULK_ENROLL_DELAY_MS));
 
@@ -150,7 +163,7 @@ export const CartProvider = ({ children, allFormations }) => {
 
     const enrollmentPromises = selectedFormations.map(async (formationId) => {
       try {
-        const response = await fetch(ENROLLMENT_API_ENDPOINT, {
+        const response = await fetch(ENDPOINTS.ENROLLMENTS, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({ formationId }),
@@ -160,7 +173,7 @@ export const CartProvider = ({ children, allFormations }) => {
           successfulEnrollments++;
           return { status: 'fulfilled', formationId };
         } else {
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue du serveur' }));
           failedEnrollments.push({ id: formationId, message: errorData.message || 'Erreur inconnue' });
           console.error(`Échec de l'inscription pour ${formationId}:`, errorData);
           return { status: 'rejected', formationId, error: errorData.message || 'Erreur inconnue' };
@@ -177,8 +190,8 @@ export const CartProvider = ({ children, allFormations }) => {
     const showFailedEnrollmentDetails = () => {
       if (failedEnrollments.length > 0) {
         const failedTitles = failedEnrollments.map(failed => {
-          const formation = allFormations.find(f => f._id === failed.id);
-          return formation ? formation.title : 'Formation inconnue';
+          const formation = allFormations?.find(f => f._id === failed.id);
+          return formation ? formation.title : `Formation inconnue (ID: ${failed.id})`;
         });
         toast({
           variant: "destructive",

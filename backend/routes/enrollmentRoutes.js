@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { enrollUserToFormation } = require('../controllers/enrollmentController'); // Import du contrôleur
+const { enrollUserToFormation } = require('../controllers/enrollmentController');
+const { validateEnrollment } = require('../middleware/validation');
+const { protect } = require('../middleware/authMiddleware');
 
-// Route pour enregistrer un utilisateur à une formation
-router.post('/', enrollUserToFormation);
+router.post('/', protect, validateEnrollment, enrollUserToFormation);
 
 module.exports = router;

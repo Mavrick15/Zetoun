@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// Lazy load page components
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PoliceJudiciaire = lazy(() => import("./pages/realisations/PoliceJudiciaire"));
@@ -31,38 +33,53 @@ const SignUp = lazy(() => import("./pages/SignUp"));
 const Login = lazy(() => import("./pages/Login"));
 const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+// Constants for ErrorBoundary and Suspense fallback messages
+const APP_MESSAGES = {
+  ERROR_BOUNDARY_TITLE: "Oups ! Quelque chose s'est mal passé.",
+  ERROR_BOUNDARY_P1: "Nous rencontrons un problème pour afficher cette partie de la page.",
+  ERROR_BOUNDARY_P2: "Veuillez essayer de rafraîchir la page ou de revenir plus tard.",
+  ERROR_DETAILS_SUMMARY: "Détails de l'erreur",
+  LOADING_PROGRESS_INTERVAL_MS: 200,
+  LOADING_PROGRESS_STEP: 5,
+  MAX_LOADING_PROGRESS: 95,
+};
+
+// ErrorBoundary component to catch JavaScript errors in its child component tree
+class ErrorBoundary extends React.Component<any, { hasError: boolean; error: Error | null; errorInfo: React.ErrorInfo | null }> {
+  constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error) {
+    // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // You can also log the error to an error reporting service
     console.error("Erreur détectée par ErrorBoundary:", error, errorInfo);
     this.setState({ error, errorInfo });
   }
 
   render() {
     if (this.state.hasError) {
+      // Fallback UI for errors
       return (
         <div className="flex items-center justify-center min-h-screen bg-red-50 text-red-700 p-4 rounded-lg shadow-md">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">
-              Oups ! Quelque chose s'est mal passé.
+              {APP_MESSAGES.ERROR_BOUNDARY_TITLE}
             </h2>
             <p className="mb-2">
-              Nous rencontrons un problème pour afficher cette partie de la page.
+              {APP_MESSAGES.ERROR_BOUNDARY_P1}
             </p>
             <p className="text-sm text-red-500">
-              Veuillez essayer de rafraîchir la page ou de revenir plus tard.
+              {APP_MESSAGES.ERROR_BOUNDARY_P2}
             </p>
             {process.env.NODE_ENV === 'development' && (
               <details className="mt-4 text-left p-2 bg-red-100 rounded">
-                <summary>Détails de l'erreur</summary>
+                <summary>{APP_MESSAGES.ERROR_DETAILS_SUMMARY}</summary>
                 <pre className="whitespace-pre-wrap break-all text-xs">
                   {this.state.error && this.state.error.toString()}
                   <br />
@@ -83,15 +100,16 @@ const App = () => {
   const [queryClient] = useState(() => new QueryClient());
   const [loadingProgress, setLoadingProgress] = useState(0);
 
+  // Effect to simulate loading progress for Suspense fallback
   React.useEffect(() => {
     const interval = setInterval(() => {
       setLoadingProgress((prevProgress) => {
-        if (prevProgress < 95) {
-          return prevProgress + 5;
+        if (prevProgress < APP_MESSAGES.MAX_LOADING_PROGRESS) {
+          return prevProgress + APP_MESSAGES.LOADING_PROGRESS_STEP;
         }
         return prevProgress;
       });
-    }, 200);
+    }, APP_MESSAGES.LOADING_PROGRESS_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, []);
@@ -104,6 +122,7 @@ const App = () => {
         <BrowserRouter>
           <ErrorBoundary>
             <Suspense fallback={
+              // Fallback UI for lazy loaded components
               <div className="flex items-center justify-center min-h-screen bg-white">
                 <div className="relative w-28 h-28">
                   <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>

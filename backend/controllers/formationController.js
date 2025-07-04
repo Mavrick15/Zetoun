@@ -1,16 +1,28 @@
 const Formation = require('../models/Formation');
 const { logger } = require('../log/logger');
+const mongoose = require('mongoose');
 
-// @desc    Get all formations with pagination
-// @route   GET /api/formations
-// @access  Public
-const getFormations = async (req, res, next) => { // Ajout de 'next'
+const MESSAGES = {
+  INVALID_FORMATION_ID: 'ID de formation invalide.',
+  FORMATION_NOT_FOUND: 'Formation non trouvée',
+};
+
+const LOG_MESSAGES = {
+  RETRIEVING_ALL_FORMATIONS: 'Récupération de toutes les formations',
+  ERROR_RETRIEVING_FORMATIONS: 'Erreur lors de la récupération des formations:',
+  WARN_INVALID_FORMATION_ID: (id) => `ID de formation invalide fourni: ${id}`,
+  INFO_RETRIEVING_FORMATION_BY_ID: (id) => `Récupération de la formation avec l'ID: ${id}`,
+  WARN_FORMATION_NOT_FOUND_BY_ID: (id) => `Formation non trouvée avec l'ID: ${id}`,
+  ERROR_RETRIEVING_FORMATION_BY_ID: (id) => `Erreur lors de la récupération de la formation avec l'ID: ${id}:`,
+  INFO_NEW_FORMATION_CREATED: 'Nouvelle formation créée:',
+  ERROR_CREATING_FORMATION: 'Erreur lors de la création de la formation:',
+};
+
+const getFormations = async (req, res, next) => {
   try {
-    // Pagination parameters
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    // Optional filters
     const filters = {};
     if (req.query.level) filters.level = req.query.level;
     if (req.query.location) filters.location = { $regex: req.query.location, $options: 'i' };
@@ -21,16 +33,14 @@ const getFormations = async (req, res, next) => { // Ajout de 'next'
       ];
     }
 
-    // Get formations with pagination
     const formations = await Formation.find(filters)
       .sort({ date: 1 })
       .limit(limit)
       .skip(offset);
 
-    // Get total count for pagination
     const total = await Formation.countDocuments(filters);
 
-    logger.info('Récupération de toutes les formations', { filters, pagination: { limit, offset } });
+    logger.info(LOG_MESSAGES.RETRIEVING_ALL_FORMATIONS, { filters, pagination: { limit, offset } });
 
     res.json({
       formations,
@@ -42,42 +52,41 @@ const getFormations = async (req, res, next) => { // Ajout de 'next'
       }
     });
   } catch (error) {
-    logger.error('Erreur lors de la récupération des formations:', error.message);
-    next(error); // Passer l'erreur au middleware d'erreur
+    logger.error(LOG_MESSAGES.ERROR_RETRIEVING_FORMATIONS, error.message);
+    next(error);
   }
 };
 
-// @desc    Get formation by ID
-// @route   GET /api/formations/:id
-// @access  Public
-const getFormationById = async (req, res, next) => { // Ajout de 'next'
+const getFormationById = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      logger.warn(LOG_MESSAGES.WARN_INVALID_FORMATION_ID(req.params.id));
+      return res.status(400).json({ message: MESSAGES.INVALID_FORMATION_ID });
+    }
+
     const formation = await Formation.findById(req.params.id);
 
     if (formation) {
-      logger.info(`Récupération de la formation avec l'ID: ${req.params.id}`, { formationId: req.params.id });
+      logger.info(LOG_MESSAGES.INFO_RETRIEVING_FORMATION_BY_ID(req.params.id), { formationId: req.params.id });
       res.json(formation);
     } else {
-      logger.warn(`Formation non trouvée avec l'ID: ${req.params.id}`);
-      res.status(404).json({ message: 'Formation non trouvée' }); // Gestion spécifique, pas d'erreur à passer
+      logger.warn(LOG_MESSAGES.WARN_FORMATION_NOT_FOUND_BY_ID(req.params.id));
+      res.status(404).json({ message: MESSAGES.FORMATION_NOT_FOUND });
     }
   } catch (error) {
-    logger.error(`Erreur lors de la récupération de la formation avec l'ID: ${req.params.id}:`, error.message);
-    next(error); // Passer l'erreur au middleware d'erreur
+    logger.error(LOG_MESSAGES.ERROR_RETRIEVING_FORMATION_BY_ID(req.params.id), error.message);
+    next(error);
   }
 };
 
-// @desc    Create new formation (for seeding or admin purposes)
-// @route   POST /api/formations
-// @access  Private (would normally be protected)
-const createFormation = async (req, res, next) => { // Ajout de 'next'
+const createFormation = async (req, res, next) => {
   try {
     const formation = await Formation.create(req.body);
-    logger.info('Nouvelle formation créée:', formation);
+    logger.info(LOG_MESSAGES.INFO_NEW_FORMATION_CREATED, formation);
     res.status(201).json(formation);
   } catch (error) {
-    logger.error('Erreur lors de la création de la formation:', error.message);
-    next(error); // Passer l'erreur au middleware d'erreur
+    logger.error(LOG_MESSAGES.ERROR_CREATING_FORMATION, error.message);
+    next(error);
   }
 };
 

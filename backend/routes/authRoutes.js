@@ -4,20 +4,26 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { logger } = require('../log/logger');
+const { validationResult } = require('express-validator');
+const { validateUserSignup, validateUserLogin } = require('../middleware/validation');
+const { protect } = require('../middleware/authMiddleware');
 
-// Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };
 
-// Sign up route
-router.post('/signup', async (req, res, next) => { // Ajout de 'next'
+router.post('/signup', validateUserSignup, async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      logger.warn('Erreurs de validation lors de l\'inscription:', errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const { name, email, password } = req.body;
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       logger.warn(`Tentative d'inscription avec un email existant: ${email}`);
@@ -27,11 +33,9 @@ router.post('/signup', async (req, res, next) => { // Ajout de 'next'
       });
     }
 
-    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create the user
     const user = await User.create({
       name,
       email,
@@ -40,7 +44,6 @@ router.post('/signup', async (req, res, next) => { // Ajout de 'next'
 
     logger.info(`Nouvel utilisateur inscrit: ${email} (ID: ${user._id})`);
 
-    // Return success response with user and token
     res.status(201).json({
       success: true,
       message: 'Utilisateur créé avec succès',
@@ -53,17 +56,21 @@ router.post('/signup', async (req, res, next) => { // Ajout de 'next'
     });
   } catch (error) {
     logger.error('Erreur lors de l\'inscription:', error.message);
-    next(error); // Passer l'erreur au middleware d'erreur
+    next(error);
   }
 });
 
-// Login route
-router.post('/login', async (req, res, next) => { // Ajout de 'next'
+router.post('/login', validateUserLogin, async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      logger.warn('Erreurs de validation lors de la connexion:', errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const { email, password } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       logger.warn(`Tentative de connexion échouée pour l'email: ${email} (utilisateur non trouvé)`);
       return res.status(401).json({
@@ -72,7 +79,6 @@ router.post('/login', async (req, res, next) => { // Ajout de 'next'
       });
     }
 
-    // Check if password matches
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       logger.warn(`Tentative de connexion échouée pour l'email: ${email} (mot de passe incorrect)`);
@@ -84,7 +90,6 @@ router.post('/login', async (req, res, next) => { // Ajout de 'next'
 
     logger.info(`Utilisateur connecté: ${email} (ID: ${user._id})`);
 
-    // Return success response with user and token
     res.status(200).json({
       success: true,
       message: 'Connexion réussie',
@@ -97,26 +102,31 @@ router.post('/login', async (req, res, next) => { // Ajout de 'next'
     });
   } catch (error) {
     logger.error('Erreur lors de la connexion:', error.message);
-    next(error); // Passer l'erreur au middleware d'erreur
+    next(error);
   }
 });
 
-// Get user profile route - requires authentication
-router.get('/profile', async (req, res, next) => { // Ajout de 'next'
+router.get('/profile', protect, async (req, res, next) => {
   try {
-    logger.info('Accès au profil utilisateur (demo)');
+    if (!req.user) {
+      logger.error('Erreur: req.user non défini dans la route de profil après protection.');
+      return res.status(401).json({ message: 'Non autorisé: Informations utilisateur manquantes.' });
+    }
 
-    // For demo purposes, we'll return a mock response
+    logger.info(`Accès au profil utilisateur: ${req.user.email} (ID: ${req.user._id})`);
+
     res.status(200).json({
       success: true,
       user: {
-        name: 'Utilisateur Demo',
-        email: 'demo@example.com',
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role
       }
     });
   } catch (error) {
     logger.error('Erreur lors de la récupération du profil:', error.message);
-    next(error); // Passer l'erreur au middleware d'erreur
+    next(error);
   }
 });
 

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, X, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useCart } from './CartContext';
 
-const SCROLL_THRESHOLD = 300;
+const SCROLL_THRESHOLD = 100;
 
 const CART_BUTTON_SIZE_CLASSES = "w-16 h-12";
 const CART_BUTTON_COLORS = "bg-gradient-to-br from-black to-gray-800 text-white";
@@ -14,7 +14,6 @@ const CART_BADGE_COLORS = "bg-white/90 text-black border-2 border-black/50";
 const MODAL_BORDER_COLOR_SOFTER = "border-gray-200";
 const MODAL_BG_COLOR_HEADER_FOOTER = "bg-gray-50";
 const MODAL_MAIN_BG_COLOR = "bg-white";
-const MODAL_TEXT_COLOR = "text-gray-800";
 const MODAL_CLOSE_BUTTON_COLORS = "text-gray-500 hover:bg-gray-200";
 const MODAL_ENROLL_BUTTON_COLORS = "bg-gray-800 hover:bg-gray-900 text-white";
 
@@ -121,8 +120,7 @@ const FloatingCart = ({ allFormations }) => {
     return () => clearTimeout(notificationTimer);
   }, [isBulkEnrolling, enrollingId]);
 
-  // Calcul du décalage vertical en px
-  const offsetY = isNotificationVisible ? -70 : 0; // Décaler de 70px vers le haut si notification visible
+  const offsetY = isNotificationVisible ? -70 : 0;
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -177,14 +175,13 @@ const FloatingCart = ({ allFormations }) => {
             style={{ translateY: offsetY }}
           >
             <ShoppingCart className="h-6 w-6" />
-            {/* Le badge de nombre est réintégré ici */}
             {selectedFormations.length > 0 && (
               <span
                 className={`absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center border-2 ${CART_BADGE_COLORS}`}
                 aria-live="polite"
               >
-                  {selectedFormations.length}
-                </span>
+                {selectedFormations.length}
+              </span>
             )}
           </motion.button>
         )}
@@ -197,16 +194,14 @@ const FloatingCart = ({ allFormations }) => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className={`fixed bottom-[calc(theme(spacing.12)+theme(spacing.12)+theme(spacing.2))] right-6 z-[60] w-full max-w-xs ${MODAL_MAIN_BG_COLOR} border ${MODAL_BORDER_COLOR_SOFTER} shadow-xl rounded-2xl flex flex-col`}
+            className={`fixed right-4 bottom-[calc(theme(spacing.12)+theme(spacing.12)+theme(spacing.2))]
+                             md:max-w-xs
+                             z-[60] ${MODAL_MAIN_BG_COLOR} border ${MODAL_BORDER_COLOR_SOFTER} shadow-xl rounded-t-2xl flex flex-col`}
             role="dialog"
             aria-modal="true"
             aria-labelledby="cart-modal-title"
             style={{ translateY: offsetY }}
           >
-            {/* Le pointeur triangulaire blanc est supprimé (commenté) ici */}
-            {/* <div className="absolute -bottom-2 right-4 w-4 h-4 bg-white transform rotate-45 border-r border-b"
-                 style={{ borderColor: MODAL_BORDER_COLOR_SOFTER.split('-').pop() }}></div> */}
-
             <motion.div
               variants={contentVariants}
               initial="hidden"
@@ -215,7 +210,7 @@ const FloatingCart = ({ allFormations }) => {
               className="flex flex-col h-full"
             >
               <div className={`flex items-center justify-between p-3 border-b ${MODAL_BORDER_COLOR_SOFTER} ${MODAL_BG_COLOR_HEADER_FOOTER} rounded-t-2xl`}>
-                <h2 id="cart-modal-title" className="text-lg font-bold">Votre Panier</h2>
+                <h2 id="cart-modal-title" className="text-lg font-bold">Votre panier a cours</h2>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -238,13 +233,13 @@ const FloatingCart = ({ allFormations }) => {
                         key={formationId}
                         className="p-2 shadow-sm flex items-center justify-between bg-white text-gray-900 text-sm hover:shadow-md hover:scale-[1.02] transition-all"
                       >
-                        <span className="font-medium truncate">{course ? course.title : 'Formation inconnue'}</span>
+                        <span className="font-medium truncate">{course ? course.title : `Formation inconnue (ID: ${formationId})`}</span>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => removeFromCart(formationId)}
-                          className="text-gray-500 hover:text-red-600 hover:bg-gray-100"
                           aria-label={`Retirer ${course ? course.title : 'cette formation'} du panier`}
+                          className="text-gray-500 hover:text-red-600 hover:bg-gray-100"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -263,7 +258,7 @@ const FloatingCart = ({ allFormations }) => {
                 >
                   <span className="relative z-10 flex items-center justify-center text-sm">
                     {isBulkEnrolling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-                    {isBulkEnrolling ? "" : `S'inscrire (${selectedFormations.length})`}
+                    {isBulkEnrolling ? "Inscription en cours..." : `S'inscrire (${selectedFormations.length})`}
                   </span>
                   <div className="absolute inset-0 bg-gray-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
                 </Button>

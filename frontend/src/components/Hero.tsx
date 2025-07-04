@@ -1,8 +1,31 @@
 import { ArrowRight, Server, BookOpen, LifeBuoy, MessageSquare } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import SEO from "./SEO";
+
+// Constants for all French texts
+const TEXTS = {
+  SEO_TITLE: "Zetoun Labs - Solutions IT Complètes pour Entreprises et Particuliers à Kinshasa",
+  SEO_DESCRIPTION: "Zetoun Labs offre des services informatiques sur mesure, des formations certifiantes et un support technique fiable à Kinshasa. Experts en ingénierie réseau, vidéosurveillance, développement web, infogérance et installation solaire.",
+  SEO_KEYWORDS: [
+    "Zetoun Labs", "IT Kinshasa", "services informatiques RDC", "formation IT Kinshasa",
+    "support technique Kinshasa", "ingénierie réseau", "vidéosurveillance",
+    "développement web Kinshasa", "infogérance", "installation solaire RDC",
+    "solutions IT Kinshasa", "maintenance informatique Kinshasa", "experts informatiques Kinshasa"
+  ],
+  IMAGE_ALT_PRIMARY: "Bureau moderne de Zetoun Labs avec équipements informatiques et professionnels en discussion à Kinshasa",
+  IMAGE_ALT_FALLBACK: "Image de remplacement pour l'arrière-plan de Zetoun Labs",
+  HERO_TITLE: "Votre infrastructure, Notre expertise en IT à Kinshasa.",
+  HERO_SUBTITLE: "Nous offrons des services informatiques sur mesure, des formations accessibles à tous et un support technique fiable pour particuliers et entreprises à Kinshasa, RDC.",
+  BUTTON_PROJECTS: "Découvrez nos projets IT",
+  BUTTON_CONTACT: "Contactez-nous pour vos besoins IT",
+  SERVICE_IT_TITLE: "Services IT Complet de Zetoun Labs",
+  SERVICE_IT_DESCRIPTION: "Conception, déploiement et maintenance de vos infrastructures informatiques pour une performance optimale à Kinshasa.",
+  FORMATION_IT_TITLE: "Formations IT Certifiantes à Kinshasa",
+  FORMATION_IT_DESCRIPTION: "Formations personnalisées en technologies de l'information (IT) pour tous les niveaux, du débutant à l'expert en RDC.",
+  SUPPORT_IT_TITLE: "Support Technique IT Fiable",
+  SUPPORT_IT_DESCRIPTION: "Assistance technique rapide et fiable pour résoudre vos problèmes informatiques et assurer la continuité de vos opérations à Kinshasa.",
+};
 
 const Hero = () => {
   const isMobile = useIsMobile();
@@ -18,6 +41,7 @@ const Hero = () => {
       }
     }
   };
+
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -29,30 +53,22 @@ const Hero = () => {
     }
   };
 
-  const scrollToContact = (e) => {
+  const scrollToSection = (e, id) => {
     e.preventDefault();
-    const contactSection = document.getElementById('contact');
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  const title = "Zetoun Labs - Solutions IT Complètes pour Entreprises et Particuliers à Kinshasa";
-  const description = "Zetoun Labs offre des services informatiques sur mesure, des formations certifiantes et un support technique fiable à Kinshasa. Experts en ingénierie réseau, vidéosurveillance, développement web, infogérance et installation solaire.";
-  const keywords = [
-    "Zetoun Labs", "IT Kinshasa", "services informatiques RDC", "formation IT Kinshasa",
-    "support technique Kinshasa", "ingénierie réseau", "vidéosurveillance",
-    "développement web Kinshasa", "infogérance", "installation solaire RDC",
-    "solutions IT Kinshasa", "maintenance informatique Kinshasa", "experts informatiques Kinshasa"
-  ];
   const imageUrl = "/lovable-uploads/img/hero.png";
 
   return (
     <motion.div className="relative mt-16 md:mt-0 w-full max-w-[100vw]" initial="hidden" animate="visible" variants={containerVariants}>
       <SEO
-        title={title}
-        description={description}
-        keywords={keywords}
+        title={TEXTS.SEO_TITLE}
+        description={TEXTS.SEO_DESCRIPTION}
+        keywords={TEXTS.SEO_KEYWORDS}
         imageUrl={imageUrl}
         type="website"
       />
@@ -61,12 +77,12 @@ const Hero = () => {
         <div className="absolute inset-0 bg-black w-full">
           <img
             src={imageUrl}
-            alt="Bureau moderne de Zetoun Labs avec équipements informatiques et professionnels en discussion à Kinshasa"
+            alt={TEXTS.IMAGE_ALT_PRIMARY}
             className={`w-full h-full object-cover opacity-70 grayscale ${isMobile ? 'object-right' : 'object-center'}`}
             onError={(e) => {
               e.currentTarget.onerror = null;
               e.currentTarget.src = "https://placehold.co/1200x750/333333/FFFFFF?text=Image+de+fond+Zetoun+Labs";
-              e.currentTarget.alt = "Image de remplacement pour l'arrière-plan de Zetoun Labs";
+              e.currentTarget.alt = TEXTS.IMAGE_ALT_FALLBACK;
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-white"></div>
@@ -76,31 +92,24 @@ const Hero = () => {
           <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full">
             <motion.div className="w-full max-w-4xl text-center" variants={itemVariants}>
               <motion.h1 className="banner-title text-white text-3xl md:text-5xl lg:text-6xl font-bold" variants={itemVariants}>
-                Votre infrastructure, Notre expertise en IT à Kinshasa.
+                {TEXTS.HERO_TITLE}
               </motion.h1>
               <motion.p className="banner-subtitle text-gray-300 mt-4 md:mt-6 text-sm md:text-base max-w-2xl mx-auto" variants={itemVariants}>
-                Nous offrons des services informatiques sur mesure, des formations accessibles à tous
-                et un support technique fiable pour particuliers et entreprises à Kinshasa, RDC.
+                {TEXTS.HERO_SUBTITLE}
               </motion.p>
               <motion.div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-6 md:mt-8 justify-center" variants={itemVariants}>
                 <button
                   className="px-6 md:px-8 py-2 md:py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all shadow-lg hover:shadow-xl hover:shadow-gray-300/20 flex items-center justify-center group text-sm md:text-base"
-                  onClick={e => {
-                    e.preventDefault();
-                    const projectsSection = document.getElementById('projects');
-                    if (projectsSection) {
-                      projectsSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={e => scrollToSection(e, 'projects')}
                 >
-                  Découvrez nos projets IT
+                  {TEXTS.BUTTON_PROJECTS}
                   <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   className="px-6 md:px-8 py-2 md:py-3 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:shadow-gray-300/20 flex items-center justify-center group text-sm md:text-base"
-                  onClick={scrollToContact}
+                  onClick={e => scrollToSection(e, 'contact')}
                 >
-                  Contactez-nous pour vos besoins IT
+                  {TEXTS.BUTTON_CONTACT}
                   <MessageSquare className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
                 </button>
               </motion.div>
@@ -115,9 +124,9 @@ const Hero = () => {
             <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 flex items-center justify-center rounded-lg text-gray-500 mb-2 md:mb-3">
               <Server className="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2 text-gray-800">Services IT Complet de Zetoun Labs</h3>
+            <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2 text-gray-800">{TEXTS.SERVICE_IT_TITLE}</h3>
             <p className="text-gray-600 text-xs md:text-sm">
-              Conception, déploiement et maintenance de vos infrastructures informatiques pour une performance optimale à Kinshasa.
+              {TEXTS.SERVICE_IT_DESCRIPTION}
             </p>
           </motion.div>
 
@@ -125,9 +134,9 @@ const Hero = () => {
             <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 flex items-center justify-center rounded-lg text-gray-500 mb-2 md:mb-3">
               <BookOpen className="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2 text-gray-800">Formations IT Certifiantes à Kinshasa</h3>
+            <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2 text-gray-800">{TEXTS.FORMATION_IT_TITLE}</h3>
             <p className="text-gray-600 text-xs md:text-sm">
-              Formations personnalisées en technologies de l'information (IT) pour tous les niveaux, du débutant à l'expert en RDC.
+              {TEXTS.FORMATION_IT_DESCRIPTION}
             </p>
           </motion.div>
 
@@ -135,9 +144,9 @@ const Hero = () => {
             <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 flex items-center justify-center rounded-lg text-gray-500 mb-2 md:mb-3">
               <LifeBuoy className="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2 text-gray-800">Support Technique IT Fiable</h3>
+            <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2 text-gray-800">{TEXTS.SUPPORT_IT_TITLE}</h3>
             <p className="text-gray-600 text-xs md:text-sm">
-              Assistance technique rapide et fiable pour résoudre vos problèmes informatiques et assurer la continuité de vos opérations à Kinshasa.
+              {TEXTS.SUPPORT_IT_DESCRIPTION}
             </p>
           </motion.div>
         </motion.div>
