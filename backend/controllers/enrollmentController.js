@@ -5,7 +5,6 @@ const User = require('../models/User');
 const { logger } = require('../log/logger');
 const mongoose = require('mongoose');
 
-// Define constants for messages
 const MESSAGES = {
   TOKEN_MISSING: 'Non autorisé : Token manquant.',
   TOKEN_INVALID: 'Non autorisé : Token invalide. Détail:',
@@ -20,20 +19,19 @@ const MESSAGES = {
   UNEXPECTED_ERROR: 'Erreur inattendue lors de l\'enrôlement:'
 };
 
-// Define constants for log messages
 const LOG_MESSAGES = {
   WARN_NO_TOKEN: 'Tentative d\'enrôlement sans token d\'authentification.',
   ERROR_TOKEN_VERIFICATION: 'Erreur de vérification du token:',
   ERROR_USER_ID_MISSING: 'ID utilisateur manquant après décodage du token.',
   WARN_FORMATION_ID_MISSING: 'ID de formation manquant dans la requête.',
   WARN_FORMATION_ID_INVALID: 'ID de formation invalide:',
-  WARN_USER_NOT_FOUND: (userId) => `Utilisateur non trouvé dans la base de données pour l'ID: ${userId}. Enrôlement annulé.`,
-  INFO_ATTEMPT_ENROLL: (userEmail, userId, formationId) => `Tentative d'enrôlement de l'utilisateur "${userEmail}" (ID: ${userId}) à la formation ID: ${formationId}.`,
-  WARN_ALREADY_ENROLLED: (userEmail, userId, formationId) => `Utilisateur "${userEmail}" (ID: ${userId}) déjà inscrit à la formation ID: ${formationId}.`,
-  WARN_FORMATION_NOT_FOUND_UPDATE: (formationId, userEmail) => `Formation avec l'ID: ${formationId} non trouvée lors de la tentative de mise à jour pour l'utilisateur "${userEmail}".`,
-  WARN_NO_SEATS_AVAILABLE: (formationTitle, formationId, userEmail) => `Plus de places disponibles pour la formation "${formationTitle}" (ID: ${formationId}). L'utilisateur "${userEmail}" n'a pas pu s'inscrire.`,
-  INFO_SEAT_DECREMENTED: (formationTitle, formationId, newSeats) => `Nombre de places décrémenté avec succès pour la formation "${formationTitle}" (ID: ${formationId}). Nouvelles places: ${newSeats}.`,
-  INFO_ENROLLMENT_SUCCESS: (userEmail, formationTitle, enrollmentId) => `Utilisateur "${userEmail}" inscrit avec succès à la formation "${formationTitle}" (ID d'enrôlement: ${enrollmentId}).`,
+  WARN_USER_NOT_FOUND: () => `Utilisateur non trouvé dans la base de données. Enrôlement annulé.`,
+  INFO_ATTEMPT_ENROLL: (userName, formationTitle) => `Tentative d'enrôlement de l'utilisateur "${userName}" à la formation "${formationTitle}".`,
+  WARN_ALREADY_ENROLLED: (userName, formationTitle) => `Utilisateur "${userName}" déjà inscrit à la formation "${formationTitle}".`,
+  WARN_FORMATION_NOT_FOUND_UPDATE: (userName) => `Formation non trouvée lors de la tentative de mise à jour pour l'utilisateur "${userName}".`,
+  WARN_NO_SEATS_AVAILABLE: (formationTitle, userName) => `Plus de places disponibles pour la formation "${formationTitle}". L'utilisateur "${userName}" n'a pas pu s'inscrire.`,
+  INFO_SEAT_DECREMENTED: (formationTitle, newSeats) => `Nombre de places décrémenté avec succès pour la formation "${formationTitle}". Nouvelles places: ${newSeats}.`,
+  INFO_ENROLLMENT_SUCCESS: (userName, formationTitle) => `Utilisateur "${userName}" inscrit avec succès à la formation "${formationTitle}".`,
   ERROR_UNEXPECTED: 'Erreur inattendue lors de l\'enrôlement:'
 };
 
@@ -51,7 +49,7 @@ const enrollUserToFormation = async (req, res, next) => {
     try {
       decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
-      logger.error(`${LOG_MESSAGES.ERROR_TOKEN_VERIFICATION} ${error.message}`);
+      logger.error(`${LOG_MESSAGES.ERROR_TOKEN_VERIFICATION} ${error.message}`, { error: error.message });
       return res.status(401).json({ message: `${MESSAGES.TOKEN_INVALID} ${error.message}` });
     }
 
@@ -68,21 +66,27 @@ const enrollUserToFormation = async (req, res, next) => {
     }
 
     if (!mongoose.Types.ObjectId.isValid(formationId)) {
-      logger.warn(`${LOG_MESSAGES.WARN_FORMATION_ID_INVALID} ${formationId}`);
+      logger.warn(`${LOG_MESSAGES.WARN_FORMATION_ID_INVALID} ${formationId}`, { formationId });
       return res.status(400).json({ message: MESSAGES.FORMATION_ID_INVALID });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      logger.warn(LOG_MESSAGES.WARN_USER_NOT_FOUND(userId));
+      logger.warn(LOG_MESSAGES.WARN_USER_NOT_FOUND(), { userId });
       return res.status(404).json({ message: MESSAGES.USER_NOT_FOUND });
     }
 
-    logger.info(LOG_MESSAGES.INFO_ATTEMPT_ENROLL(user.email, userId, formationId));
+    const formationDetails = await Formation.findById(formationId);
+    if (!formationDetails) {
+      logger.warn(LOG_MESSAGES.WARN_FORMATION_NOT_FOUND_UPDATE(user.name), { formationId, userName: user.name });
+      return res.status(404).json({ message: MESSAGES.FORMATION_NOT_FOUND });
+    }
+
+    logger.info(LOG_MESSAGES.INFO_ATTEMPT_ENROLL(user.name, formationDetails.title), { userName: user.name, userId, formationId, formationTitle: formationDetails.title });
 
     const existingEnrollment = await Enrollment.findOne({ user: userId, formation: formationId });
     if (existingEnrollment) {
-      logger.warn(LOG_MESSAGES.WARN_ALREADY_ENROLLED(user.email, userId, formationId));
+      logger.warn(LOG_MESSAGES.WARN_ALREADY_ENROLLED(user.name, formationDetails.title), { userName: user.name, userId, formationId, formationTitle: formationDetails.title });
       return res.status(400).json({ message: MESSAGES.ALREADY_ENROLLED });
     }
 
@@ -95,15 +99,15 @@ const enrollUserToFormation = async (req, res, next) => {
     if (!updatedFormation) {
       const formationCheck = await Formation.findById(formationId);
       if (!formationCheck) {
-        logger.warn(LOG_MESSAGES.WARN_FORMATION_NOT_FOUND_UPDATE(formationId, user.email));
+        logger.warn(LOG_MESSAGES.WARN_FORMATION_NOT_FOUND_UPDATE(user.name), { formationId, userName: user.name });
         return res.status(404).json({ message: MESSAGES.FORMATION_NOT_FOUND });
       } else {
-        logger.warn(LOG_MESSAGES.WARN_NO_SEATS_AVAILABLE(formationCheck.title, formationId, user.email));
+        logger.warn(LOG_MESSAGES.WARN_NO_SEATS_AVAILABLE(formationCheck.title, user.name), { formationId, formationTitle: formationCheck.title, userName: user.name });
         return res.status(400).json({ message: MESSAGES.NO_SEATS_AVAILABLE });
       }
     }
 
-    logger.info(LOG_MESSAGES.INFO_SEAT_DECREMENTED(updatedFormation.title, updatedFormation._id, updatedFormation.seats));
+    logger.info(LOG_MESSAGES.INFO_SEAT_DECREMENTED(updatedFormation.title, updatedFormation.seats), { formationId: updatedFormation._id, formationTitle: updatedFormation.title, newSeats: updatedFormation.seats });
 
     const enrollment = await Enrollment.create({
       user: userId,
@@ -120,7 +124,7 @@ const enrollUserToFormation = async (req, res, next) => {
       formationLevel: updatedFormation.level
     });
 
-    logger.info(LOG_MESSAGES.INFO_ENROLLMENT_SUCCESS(user.email, updatedFormation.title, enrollment._id));
+    logger.info(LOG_MESSAGES.INFO_ENROLLMENT_SUCCESS(user.name, updatedFormation.title), { userName: user.name, userId, formationId: updatedFormation._id, formationTitle: updatedFormation.title, enrollmentId: enrollment._id });
 
     res.status(201).json({ message: MESSAGES.ENROLLMENT_SUCCESS(updatedFormation.title), enrollment });
 

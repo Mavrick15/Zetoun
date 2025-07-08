@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 const { logger } = require('../log/logger');
 
-// Define constants for messages and log messages
 const EMAIL_MESSAGES = {
   SMTP_ERROR: "Erreur de connexion SMTP :",
   SMTP_READY: "Serveur SMTP prêt à prendre des messages",
@@ -42,7 +41,6 @@ const HTML_STYLES = {
   CLIENT_FOOTER_DIV: "background-color: #f8f8f8; color: #777; padding: 15px; text-align: center; font-size: 12px; border-top: 1px solid #eee;",
 };
 
-
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
@@ -61,88 +59,108 @@ transporter.verify(function(error, success) {
   }
 });
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const sendEmailWithRetry = async (mailOptions, maxRetries = 3, retryDelayMs = 2000) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await transporter.sendMail(mailOptions);
+      return true;
+    } catch (error) {
+      logger.warn(`Tentative ${attempt}/${maxRetries} d'envoi d'e-mail échouée. Cible : ${mailOptions.to}. Erreur : ${error.message}`);
+      if (attempt < maxRetries) {
+        await sleep(retryDelayMs * attempt);
+      } else {
+        throw error;
+      }
+    }
+  }
+};
+
 const sendAdminNotificationEmail = async ({ name, email, subject, message }) => {
+  const adminMailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: process.env.ADMIN_EMAIL,
+    subject: EMAIL_MESSAGES.ADMIN_NOTIFICATION_SUBJECT(subject, name),
+    html: `
+      <div style="${HTML_STYLES.MAIN_DIV}">
+          <div style="${HTML_STYLES.HEADER_DIV}">
+              <h1 style="${HTML_STYLES.H1_TITLE}">Nouvelle demande client</h1>
+              <p style="${HTML_STYLES.P_SUBTITLE}">Zetoun Labs - Notification Système</p>
+          </div>
+          <div style="${HTML_STYLES.CONTENT_DIV}">
+              <p style="${HTML_STYLES.P_BODY}">Une nouvelle demande a été soumise via le formulaire de contact du site web.</p>
+              <h3 style="${HTML_STYLES.H3_DETAILS}">Détails de la demande :</h3>
+              <table style="${HTML_STYLES.TABLE_STYLE}">
+                  <tr>
+                      <td style="${HTML_STYLES.TABLE_TD_BOLD}">Nom complet :</td>
+                      <td style="${HTML_STYLES.TABLE_TD_NORMAL}">${name}</td>
+                  </tr>
+                  <tr>
+                      <td style="${HTML_STYLES.TABLE_TD_BOLD}">Adresse e-mail :</td>
+                      <td style="${HTML_STYLES.TABLE_TD_NORMAL}">${email}</td>
+                  </tr>
+                  <tr>
+                      <td style="${HTML_STYLES.TABLE_TD_BOLD}">Sujet de la demande :</td>
+                      <td style="${HTML_STYLES.TABLE_TD_NORMAL}">${subject}</td>
+                  </tr>
+              </table>
+              <div style="${HTML_STYLES.MESSAGE_DIV}">
+                  <h3 style="${HTML_STYLES.MESSAGE_H3}">Message de l'utilisateur :</h3>
+                  <p style="${HTML_STYLES.MESSAGE_P}">${message.replace(/\n/g, '<br>')}</p>
+              </div>
+          </div>
+          <div style="${HTML_STYLES.FOOTER_DIV}">
+              Ceci est une notification système automatique de Zetoun Labs. Veuillez ne pas y répondre directement.
+          </div>
+      </div>
+    `,
+  };
+
   try {
-    const adminMailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: process.env.ADMIN_EMAIL,
-      subject: EMAIL_MESSAGES.ADMIN_NOTIFICATION_SUBJECT(subject, name),
-      html: `
-        <div style="${HTML_STYLES.MAIN_DIV}">
-            <div style="${HTML_STYLES.HEADER_DIV}">
-                <h1 style="${HTML_STYLES.H1_TITLE}">Nouvelle Demande Client</h1>
-                <p style="${HTML_STYLES.P_SUBTITLE}">Zetoun Labs - Notification Système</p>
-            </div>
-            <div style="${HTML_STYLES.CONTENT_DIV}">
-                <p style="${HTML_STYLES.P_BODY}">Une nouvelle demande a été soumise via le formulaire de contact du site web.</p>
-                <h3 style="${HTML_STYLES.H3_DETAILS}">Détails de la demande :</h3>
-                <table style="${HTML_STYLES.TABLE_STYLE}">
-                    <tr>
-                        <td style="${HTML_STYLES.TABLE_TD_BOLD}">Nom complet :</td>
-                        <td style="${HTML_STYLES.TABLE_TD_NORMAL}">${name}</td>
-                    </tr>
-                    <tr>
-                        <td style="${HTML_STYLES.TABLE_TD_BOLD}">Adresse e-mail :</td>
-                        <td style="${HTML_STYLES.TABLE_TD_NORMAL}">${email}</td>
-                    </tr>
-                    <tr>
-                        <td style="${HTML_STYLES.TABLE_TD_BOLD}">Sujet de la demande :</td>
-                        <td style="${HTML_STYLES.TABLE_TD_NORMAL}">${subject}</td>
-                    </tr>
-                </table>
-                <div style="${HTML_STYLES.MESSAGE_DIV}">
-                    <h3 style="${HTML_STYLES.MESSAGE_H3}">Message de l'utilisateur :</h3>
-                    <p style="${HTML_STYLES.MESSAGE_P}">${message.replace(/\n/g, '<br>')}</p>
-                </div>
-            </div>
-            <div style="${HTML_STYLES.FOOTER_DIV}">
-                Ceci est une notification système automatique de Zetoun Labs. Veuillez ne pas y répondre directement.
-            </div>
-        </div>
-      `,
-    };
-    await transporter.sendMail(adminMailOptions);
+    await sendEmailWithRetry(adminMailOptions);
     logger.info(EMAIL_MESSAGES.ADMIN_NOTIFICATION_INFO(email));
   } catch (error) {
-    logger.error(EMAIL_MESSAGES.ADMIN_NOTIFICATION_ERROR(email), error);
+    logger.error(EMAIL_MESSAGES.ADMIN_NOTIFICATION_ERROR(email), { message: error.message, stack: error.stack });
   }
 };
 
 const sendClientConfirmationEmail = async ({ name, email, subject }) => {
+  const clientMailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: EMAIL_MESSAGES.CLIENT_CONFIRMATION_SUBJECT,
+    html: `
+      <div style="${HTML_STYLES.CLIENT_MAIN_DIV}">
+          <div style="${HTML_STYLES.CLIENT_HEADER_DIV}">
+              <h1 style="${HTML_STYLES.CLIENT_H1_TITLE}">ZETOUN LABS</h1>
+              <p style="${HTML_STYLES.CLIENT_P_SUBTITLE}">L'expertise au service de votre avenir numérique</p>
+          </div>
+          <div style="${HTML_STYLES.CLIENT_CONTENT_DIV}">
+              <p style="${HTML_STYLES.CLIENT_P_REGULAR}">Cher(e) <strong style="${HTML_STYLES.CLIENT_P_BOLD_TEXT}">${name}</strong>,</p>
+              <p>Nous vous confirmons avec plaisir la bonne réception de votre demande concernant : <strong style="${HTML_STYLES.CLIENT_P_BOLD_TEXT}">"${subject}"</strong>.</p>
+              <p>Votre démarche est précieuse pour Zetoun Labs. Nous nous engageons à vous offrir une réponse de qualité dans les meilleurs délais.</p>
+              <p>Un membre de notre équipe d'experts examinera votre requête avec la plus grande attention et vous contactera personnellement sous **48 heures ouvrables** afin de vous apporter une solution adaptée ou des conseils pertinents.</p>
+              <p style="${HTML_STYLES.CLIENT_P_MARGIN_TOP}">En attendant notre prise de contact, n'hésitez pas à explorer nos différentes <a href="${process.env.FRONTEND_URL}/formations" style="${HTML_STYLES.CLIENT_LINK_STYLE}">formations IT sur notre site web</a>. Vous y trouverez peut-être des opportunités pour renforcer vos compétences ou celles de votre équipe.</p>
+              <p style="${HTML_STYLES.CLIENT_P_MARGIN_TOP}">Nous vous remercions de votre confiance et sommes impatients d'échanger avec vous.</p>
+              <p style="${HTML_STYLES.CLIENT_P_MARGIN_TOP} ${HTML_STYLES.CLIENT_P_SMALL_FONT}">
+                  Cordialement,<br/>
+                  L'équipe de Zetoun Labs<br/>
+                  <a href="${process.env.FRONTEND_URL}" style="color: #000; text-decoration: none;">www.zetounlabs.cd</a>
+              </p>
+          </div>
+          <div style="${HTML_STYLES.CLIENT_FOOTER_DIV}">
+              Ceci est un e-mail automatique. Veuillez ne pas y répondre.
+          </div>
+      </div>
+    `,
+  };
+
   try {
-    const clientMailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: EMAIL_MESSAGES.CLIENT_CONFIRMATION_SUBJECT,
-      html: `
-        <div style="${HTML_STYLES.CLIENT_MAIN_DIV}">
-            <div style="${HTML_STYLES.CLIENT_HEADER_DIV}">
-                <h1 style="${HTML_STYLES.CLIENT_H1_TITLE}">ZETOUN LABS</h1>
-                <p style="${HTML_STYLES.CLIENT_P_SUBTITLE}">L'expertise au service de votre avenir numérique</p>
-            </div>
-            <div style="${HTML_STYLES.CLIENT_CONTENT_DIV}">
-                <p style="${HTML_STYLES.CLIENT_P_REGULAR}">Cher(e) <strong style="${HTML_STYLES.CLIENT_P_BOLD_TEXT}">${name}</strong>,</p>
-                <p>Nous vous confirmons avec plaisir la bonne réception de votre demande concernant : <strong style="${HTML_STYLES.CLIENT_P_BOLD_TEXT}">"${subject}"</strong>.</p>
-                <p>Votre démarche est précieuse pour Zetoun Labs. Nous nous engageons à vous offrir une réponse de qualité dans les meilleurs délais.</p>
-                <p>Un membre de notre équipe d'experts examinera votre requête avec la plus grande attention et vous contactera personnellement sous **48 heures ouvrables** afin de vous apporter une solution adaptée ou des conseils pertinents.</p>
-                <p style="${HTML_STYLES.CLIENT_P_MARGIN_TOP}">En attendant notre prise de contact, n'hésitez pas à explorer nos différentes <a href="${process.env.FRONTEND_URL}/formations" style="${HTML_STYLES.CLIENT_LINK_STYLE}">formations IT sur notre site web</a>. Vous y trouverez peut-être des opportunités pour renforcer vos compétences ou celles de votre équipe.</p>
-                <p style="${HTML_STYLES.CLIENT_P_MARGIN_TOP}">Nous vous remercions de votre confiance et sommes impatients d'échanger avec vous.</p>
-                <p style="${HTML_STYLES.CLIENT_P_MARGIN_TOP} ${HTML_STYLES.CLIENT_P_SMALL_FONT}">
-                    Cordialement,<br/>
-                    L'équipe de Zetoun Labs<br/>
-                    <a href="${process.env.FRONTEND_URL}" style="color: #000; text-decoration: none;">www.zetounlabs.cd</a>
-                </p>
-            </div>
-            <div style="${HTML_STYLES.CLIENT_FOOTER_DIV}">
-                Ceci est un e-mail automatique. Veuillez ne pas y répondre.
-            </div>
-        </div>
-      `,
-    };
-    await transporter.sendMail(clientMailOptions);
+    await sendEmailWithRetry(clientMailOptions);
     logger.info(EMAIL_MESSAGES.CLIENT_CONFIRMATION_INFO(email));
   } catch (error) {
-    logger.error(EMAIL_MESSAGES.CLIENT_CONFIRMATION_ERROR(email), error);
+    logger.error(EMAIL_MESSAGES.CLIENT_CONFIRMATION_ERROR(email), { message: error.message, stack: error.stack });
   }
 };
 

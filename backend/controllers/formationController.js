@@ -10,10 +10,10 @@ const MESSAGES = {
 const LOG_MESSAGES = {
   RETRIEVING_ALL_FORMATIONS: 'Récupération de toutes les formations',
   ERROR_RETRIEVING_FORMATIONS: 'Erreur lors de la récupération des formations:',
-  WARN_INVALID_FORMATION_ID: (id) => `ID de formation invalide fourni: ${id}`,
-  INFO_RETRIEVING_FORMATION_BY_ID: (id) => `Récupération de la formation avec l'ID: ${id}`,
-  WARN_FORMATION_NOT_FOUND_BY_ID: (id) => `Formation non trouvée avec l'ID: ${id}`,
-  ERROR_RETRIEVING_FORMATION_BY_ID: (id) => `Erreur lors de la récupération de la formation avec l'ID: ${id}:`,
+  WARN_INVALID_FORMATION_ID: 'ID de formation invalide fourni.',
+  INFO_RETRIEVING_FORMATION_BY_ID: 'Récupération de la formation.',
+  WARN_FORMATION_NOT_FOUND_BY_ID: 'Formation non trouvée.',
+  ERROR_RETRIEVING_FORMATION_BY_ID: 'Erreur lors de la récupération de la formation:',
   INFO_NEW_FORMATION_CREATED: 'Nouvelle formation créée:',
   ERROR_CREATING_FORMATION: 'Erreur lors de la création de la formation:',
 };
@@ -60,21 +60,21 @@ const getFormations = async (req, res, next) => {
 const getFormationById = async (req, res, next) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      logger.warn(LOG_MESSAGES.WARN_INVALID_FORMATION_ID(req.params.id));
+      logger.warn(LOG_MESSAGES.WARN_INVALID_FORMATION_ID, { formationId: req.params.id });
       return res.status(400).json({ message: MESSAGES.INVALID_FORMATION_ID });
     }
 
     const formation = await Formation.findById(req.params.id);
 
     if (formation) {
-      logger.info(LOG_MESSAGES.INFO_RETRIEVING_FORMATION_BY_ID(req.params.id), { formationId: req.params.id });
+      logger.info(LOG_MESSAGES.INFO_RETRIEVING_FORMATION_BY_ID, { formationId: req.params.id, formationTitle: formation.title });
       res.json(formation);
     } else {
-      logger.warn(LOG_MESSAGES.WARN_FORMATION_NOT_FOUND_BY_ID(req.params.id));
+      logger.warn(LOG_MESSAGES.WARN_FORMATION_NOT_FOUND_BY_ID, { formationId: req.params.id });
       res.status(404).json({ message: MESSAGES.FORMATION_NOT_FOUND });
     }
   } catch (error) {
-    logger.error(LOG_MESSAGES.ERROR_RETRIEVING_FORMATION_BY_ID(req.params.id), error.message);
+    logger.error(LOG_MESSAGES.ERROR_RETRIEVING_FORMATION_BY_ID, error.message, { formationId: req.params.id });
     next(error);
   }
 };
@@ -82,7 +82,7 @@ const getFormationById = async (req, res, next) => {
 const createFormation = async (req, res, next) => {
   try {
     const formation = await Formation.create(req.body);
-    logger.info(LOG_MESSAGES.INFO_NEW_FORMATION_CREATED, formation);
+    logger.info(LOG_MESSAGES.INFO_NEW_FORMATION_CREATED, { formationId: formation._id, formationTitle: formation.title });
     res.status(201).json(formation);
   } catch (error) {
     logger.error(LOG_MESSAGES.ERROR_CREATING_FORMATION, error.message);

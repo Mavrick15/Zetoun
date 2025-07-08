@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, MapPin, Clock, Users, UserCircle, Search, Filter, AlertCircle, ArrowLeft, Loader2, DollarSign, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-// Assurez-vous que ces chemins d'importation sont corrects pour votre projet
 import PageLayout from '@/components/PageLayout';
 import SEO from '@/components/SEO';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -15,6 +14,21 @@ import { Link } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
 import FloatingCart from '@/hooks/FloatingCart';
 import { CartProvider, useCart } from '@/hooks/CartContext';
+
+const containerVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.3 } },
+};
+
+const textVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+};
 
 const TEXT_CONSTANTS = {
   DEBOUNCE_DELAY_MS: 500,
@@ -53,7 +67,6 @@ const CalendarForm = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
-  // Effet pour débouncer le terme de recherche
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -62,7 +75,6 @@ const CalendarForm = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Utilisation du hook personnalisé useFormations pour récupérer les données
   const {
     formations,
     loading,
@@ -75,7 +87,6 @@ const CalendarForm = () => {
     searchTerm: debouncedSearchTerm
   });
 
-  // Fonction pour rendre les squelettes de chargement
   const renderSkeletons = () => {
     return Array(TEXT_CONSTANTS.FORMATIONS_LIMIT_PER_PAGE).fill(0).map((_, index) => (
       <Card key={`skeleton-${index}`} className="overflow-hidden border-0 shadow-md">
@@ -115,7 +126,6 @@ const CalendarForm = () => {
 
   return (
     <Suspense fallback={
-      // Affichage de chargement initial
       <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="relative w-28 h-28">
           <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
@@ -135,26 +145,31 @@ const CalendarForm = () => {
           <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
             <div className="container mx-auto">
               <div className="max-w-6xl mx-auto">
-                {/* Bouton de retour à l'accueil */}
                 <Link to="/" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-6 transition-colors">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   {TEXT_CONSTANTS.BACK_TO_HOME}
                 </Link>
 
-                {/* Titre et sous-titre de la page */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
+                  initial="initial"
+                  animate="animate"
+                  variants={containerVariants}
                   className="text-center mb-8"
                 >
-                  <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-space">{TEXT_CONSTANTS.CALENDAR_TITLE}</h1>
-                  <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+                  <motion.h1
+                    variants={textVariants}
+                    className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-space"
+                  >
+                    {TEXT_CONSTANTS.CALENDAR_TITLE}
+                  </motion.h1>
+                  <motion.p
+                    variants={textVariants}
+                    className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto"
+                  >
                     {TEXT_CONSTANTS.CALENDAR_SUBTITLE}
-                  </p>
+                  </motion.p>
                 </motion.div>
 
-                {/* Barre de recherche et informations sur le nombre de formations */}
                 <div className="mb-8">
                   <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="relative w-full sm:max-w-md">
@@ -174,10 +189,8 @@ const CalendarForm = () => {
                   </div>
                 </div>
 
-                {/* Composant de panier flottant */}
                 <FloatingCart allFormations={formations} />
 
-                {/* Affichage conditionnel des formations, squelettes, erreurs ou état vide */}
                 <AnimatePresence mode="wait">
                   {loading ? (
                     <motion.div
@@ -186,6 +199,7 @@ const CalendarForm = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
+                      className="grid grid-cols-1 gap-8 mb-8"
                     >
                       {renderSkeletons()}
                     </motion.div>
@@ -225,9 +239,9 @@ const CalendarForm = () => {
                   ) : (
                     <motion.div
                       key="formations-list"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6 }}
+                      initial="initial"
+                      animate="animate"
+                      variants={containerVariants}
                       className="grid grid-cols-1 gap-8 mb-8"
                     >
                       {formations.map((course, index) => (
@@ -237,10 +251,9 @@ const CalendarForm = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Pagination */}
                 {!loading && !error && formations?.length > 0 && pagination?.pages > 1 && (
                   <Pagination className="my-8">
-                    <PaginationContent className="flex flex-wrap justify-center gap-2"> {/* Ajout de flex-wrap et gap pour la réactivité */}
+                    <PaginationContent className="flex flex-wrap justify-center gap-2">
                       <PaginationItem>
                         <PaginationPrevious
                           href="#"
@@ -255,49 +268,74 @@ const CalendarForm = () => {
                         />
                       </PaginationItem>
 
-                      {/* Masquer les numéros de page individuels sur les petits écrans */}
-                      {Array.from({ length: pagination.pages }, (_, i) => (
-                        <PaginationItem key={i + 1} className="hidden sm:block">
-                          <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              goToPage(i + 1);
-                            }}
-                            isActive={Math.floor(pagination.offset / pagination.limit) + 1 === i + 1}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-
-                      {/* Afficher des ellipses et le numéro de page actuel sur les petits écrans si beaucoup de pages */}
-                      {pagination.pages > 5 && (
-                        <>
-                          {Math.floor(pagination.offset / pagination.limit) + 1 > 3 && (
-                            <PaginationItem className="sm:hidden">
-                              <span className="px-3 py-1.5 text-gray-500">...</span>
-                            </PaginationItem>
-                          )}
-                          <PaginationItem className="sm:hidden">
+                      <div className="hidden sm:flex flex-wrap justify-center gap-2">
+                        {Array.from({ length: pagination.pages }, (_, i) => (
+                          <PaginationItem key={i + 1}>
                             <PaginationLink
                               href="#"
                               onClick={(e) => {
                                 e.preventDefault();
-                                goToPage(Math.floor(pagination.offset / pagination.limit) + 1);
+                                goToPage(i + 1);
                               }}
-                              isActive
+                              isActive={Math.floor(pagination.offset / pagination.limit) + 1 === i + 1}
                             >
-                              {Math.floor(pagination.offset / pagination.limit) + 1}
+                              {i + 1}
                             </PaginationLink>
                           </PaginationItem>
-                          {Math.floor(pagination.offset / pagination.limit) + 1 < pagination.pages - 2 && (
-                            <PaginationItem className="sm:hidden">
-                              <span className="px-3 py-1.5 text-gray-500">...</span>
+                        ))}
+                      </div>
+
+                      {pagination.pages > 1 && (
+                        <div className="flex sm:hidden flex-wrap justify-center gap-2">
+                            <PaginationItem>
+                                <PaginationLink
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); goToPage(1); }}
+                                isActive={Math.floor(pagination.offset / pagination.limit) + 1 === 1}
+                                >
+                                1
+                                </PaginationLink>
                             </PaginationItem>
-                          )}
-                        </>
+
+                            {Math.floor(pagination.offset / pagination.limit) + 1 > 2 && (
+                                <PaginationItem>
+                                <span className="px-3 py-1.5 text-gray-500">...</span>
+                                </PaginationItem>
+                            )}
+
+                            {Math.floor(pagination.offset / pagination.limit) + 1 !== 1 &&
+                            Math.floor(pagination.offset / pagination.limit) + 1 !== pagination.pages && (
+                                <PaginationItem>
+                                <PaginationLink
+                                    href="#"
+                                    onClick={(e) => { e.preventDefault(); goToPage(Math.floor(pagination.offset / pagination.limit) + 1); }}
+                                    isActive={true}
+                                >
+                                    {Math.floor(pagination.offset / pagination.limit) + 1}
+                                </PaginationLink>
+                                </PaginationItem>
+                            )}
+
+                            {Math.floor(pagination.offset / pagination.limit) + 1 < pagination.pages - 1 && (
+                                <PaginationItem>
+                                <span className="px-3 py-1.5 text-gray-500">...</span>
+                                </PaginationItem>
+                            )}
+
+                            {pagination.pages > 1 && (
+                                <PaginationItem>
+                                <PaginationLink
+                                    href="#"
+                                    onClick={(e) => { e.preventDefault(); goToPage(pagination.pages); }}
+                                    isActive={Math.floor(pagination.offset / pagination.limit) + 1 === pagination.pages}
+                                >
+                                    {pagination.pages}
+                                </PaginationLink>
+                                </PaginationItem>
+                            )}
+                        </div>
                       )}
+
 
                       <PaginationItem>
                         <PaginationNext
@@ -316,7 +354,6 @@ const CalendarForm = () => {
                   </Pagination>
                 )}
 
-                {/* Section "Demander une formation personnalisée" */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -328,7 +365,6 @@ const CalendarForm = () => {
                     {TEXT_CONSTANTS.CUSTOM_FORMATION_SECTION_DESCRIPTION}
                   </p>
                   <Link to={TEXT_CONSTANTS.CUSTOM_FORMATION_SECTION_LINK}>
-                    {/* Modifications ici pour rendre le bouton responsive */}
                     <Button
                       variant="outline"
                       className="bg-white hover:bg-blue-50 w-full sm:w-auto text-sm sm:text-base"
@@ -346,16 +382,17 @@ const CalendarForm = () => {
   );
 };
 
-// Composant pour afficher une carte de formation individuelle
 const FormationCard = ({ course, index }) => {
   const { addToCart, isCourseInCart, enrollingId } = useCart();
   const alreadyInCart = isCourseInCart(course._id);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      key={course._id}
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
     >
       <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 border-0 shadow-md`}>
         <div className="grid md:grid-cols-3 gap-0">
@@ -376,7 +413,6 @@ const FormationCard = ({ course, index }) => {
                   {course.level}
                 </Badge>
               </div>
-              {/* Informations sur le prix et les places disponibles sur mobile */}
               <div className="absolute bottom-4 left-4 right-4 md:hidden">
                 <div className="bg-white/95 backdrop-blur-sm rounded-lg p-3">
                   <p className="font-semibold text-blue-600">{typeof course.price === 'number' ? `${course.price.toFixed(2)}$` : course.price}</p>
@@ -392,7 +428,6 @@ const FormationCard = ({ course, index }) => {
                 <p className="text-gray-700">{course.description}</p>
               </div>
 
-              {/* Détails de la formation */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
                 <div className="flex items-start">
                   <CalendarIcon className={TEXT_CONSTANTS.ICON_CLASS} />
@@ -438,10 +473,8 @@ const FormationCard = ({ course, index }) => {
                 </div>
               </div>
 
-              {/* Bouton d'ajout au panier */}
               <div className={TEXT_CONSTANTS.CARD_BOTTOM_BORDER_CLASS}>
                 <Button
-                  // Suppression de size="lg" pour une meilleure réactivité
                   onClick={() => addToCart(course._id)}
                   disabled={alreadyInCart || course.isEnrolled || enrollingId === course._id}
                   className="relative overflow-hidden group px-4 py-2"
